@@ -1,70 +1,23 @@
+"""
+Common dataclasses.
+
+Author: Valtteri Rajalainen
+"""
+
+
 import datetime
-from typing import Union
+import typing
 
 
-__all__ = ['Timestamp', 'Session', 'Namespace']
-
-
-class Session:
-    def __init__(self, session_id, csrf_token, expires, user_id):
-        self.id = session_id
-        self.csrf_token = csrf_token
-        self.expires = expires
-        self.user_id = user_id
-
-    @classmethod
-    def from_dict(cls, dict_) -> Union[object, None]:
-        if not dict_:
-            return None
-        
-        session = Session(
-            dict_['session_id'],
-            dict_['csrf_token'],
-            Timestamp.from_str(dict_['expires']),
-            dict_['user_id'],
-        )
-        return session
-
-    @property
-    def is_anonymous(self):
-        return self.user_id == 0
-
-    @property
-    def is_expired(self):
-        return Timestamp() > self.expires
-
-
-class Namespace:
-
-    def __init__(self, data):
-        object.__setattr__(self, 'data', data)
-    
-    def __getattribute__(self, attr):
-        data = object.__getattribute__(self, 'data')
-        if attr not in self:
-            raise AttributeError(f'Namespace doesn\'t contain member "{attr}"')
-        return data[attr]
-
-    def __setattr__(self, attr, value):
-        data = object.__getattribute__(self, 'data')
-        data[attr] = value
-
-    def __str__(self):
-        return str(object.__getattribute__(self, 'data'))
-
-    def __dir__(self):
-        return dir(object.__getattribute__(self, 'data'))
-
-    def __repr__(self):
-        return str(self)
-
-    def __contains__(self, item):
-        data = object.__getattribute__(self, 'data')
-        return item in data.keys()
+__all__ = [
+    'Timestamp',
+    'Session',
+    'Namespace'
+    ]
 
 
 class Timestamp:
-    def __init__(self, delta=None):
+    def __init__(self, delta: int = None):
         date = datetime.datetime.now()
         if delta:
             date = date + datetime.timedelta(hours=delta)
@@ -88,7 +41,7 @@ class Timestamp:
         ts.year = int(year)
         return ts
 
-    def __lt__(self, times):
+    def __lt__(self, times) -> bool:
         if times.year < self.year:
             return False
         if times.year > self.year:
@@ -115,7 +68,7 @@ class Timestamp:
             return True
         return False
 
-    def __gt__(self, times):
+    def __gt__(self, times) -> bool:
         if times.year > self.year:
             return False
         if times.year < self.year:
@@ -142,7 +95,7 @@ class Timestamp:
             return True
         return False
 
-    def __eq__(self, times):
+    def __eq__(self, times) -> bool:
         comparisons = [
             self.year == times.year,
             self.month == times.month,
@@ -168,3 +121,62 @@ class Timestamp:
 
     def __repr__(self):
         return str(self)
+
+
+class Session:
+    def __init__(self, session_id: int, csrf_token: bytes, expires: Timestamp, user_id: int):
+        self.id = session_id
+        self.csrf_token = csrf_token
+        self.expires = expires
+        self.user_id = user_id
+
+    @classmethod
+    def from_dict(cls, dict_: dict) -> typing.Optional[object]:
+        if not dict_:
+            return None
+        
+        session = Session(
+            dict_['session_id'],
+            dict_['csrf_token'],
+            Timestamp.from_str(dict_['expires']),
+            dict_['user_id'],
+        )
+        return session
+
+    @property
+    def is_anonymous(self) -> bool:
+        return self.user_id == 0
+
+    @property
+    def is_expired(self) -> bool:
+        return Timestamp() > self.expires
+
+
+class Namespace:
+
+    def __init__(self, data: dict):
+        object.__setattr__(self, 'data', data)
+    
+    def __getattribute__(self, attr):
+        data = object.__getattribute__(self, 'data')
+        if attr not in self:
+            raise AttributeError(f'Namespace doesn\'t contain member "{attr}"')
+        return data[attr]
+
+    def __setattr__(self, attr: str, value: object):
+        data = object.__getattribute__(self, 'data')
+        data[attr] = value
+
+    def __str__(self):
+        return str(object.__getattribute__(self, 'data'))
+
+    def __dir__(self):
+        return dir(object.__getattribute__(self, 'data'))
+
+    def __repr__(self):
+        return str(self)
+
+    def __contains__(self, key: str):
+        data = object.__getattribute__(self, 'data')
+        return key in data.keys()
+

@@ -1,3 +1,10 @@
+"""
+Database schema implemented using the included ORM package.
+This module is executed with all datatype objects in its namespace.
+
+Author: Valtteri Rajalainen
+"""
+
 
 users = {
     'id': integer(primary_key = True, auto_increment = True),

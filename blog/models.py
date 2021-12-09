@@ -1,10 +1,17 @@
+"""
+Interface between the included ORM package and the flask application.
+
+Author Valtteri Rajalainen
+"""
+
 import sys
+import types
+
 import flask
-from types import ModuleType
 import blog.orm as orm
 
 
-class Module(ModuleType):
+class Module(types.ModuleType):
 
     def __connect(self):
         if 'database' not in flask.g:

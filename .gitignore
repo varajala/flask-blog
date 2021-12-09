@@ -1,12 +1,15 @@
 # Virtual environment
-*venv
+venv
+
+# Mypy-cache
+.mypy_cache
 
 # Pycache
 **__pycache__
 **.pyc
 
 # Other assets
-**.egg-info
+*.egg-info
 **.db
 **email-credentials
 
