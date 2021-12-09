@@ -3,18 +3,15 @@ import sys
 from pathlib import Path
 from flask import Flask
 
-import blog.security as security
-import blog.blog_app as blog_app
-import blog.admin as admin
+import blog.applications as applications
 import blog.models as models
 
 import blog.orm.manage
 import blog.security.manage
-from blog.cli import commands
+import blog.cli as cli
 
 
 def create_app(test_config = None):
-    global database
     app = Flask(__name__)
     app.config.from_object('blog.config')
 
@@ -24,13 +21,12 @@ def create_app(test_config = None):
 
     app.teardown_appcontext(models.close_connection)
 
-    app.register_blueprint(security.blueprint)
-    app.register_blueprint(blog_app.blueprint)
-    app.register_blueprint(admin.blueprint)
+    app.register_blueprint(applications.auth.blueprint)
+    app.register_blueprint(applications.admin.blueprint)
+    app.register_blueprint(applications.blog.blueprint)
     
     app.add_url_rule('/', endpoint='index')
 
-    for command in commands:
+    for command in cli.commands:
         app.cli.add_command(command)
     return app
-    
