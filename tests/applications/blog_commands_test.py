@@ -1,7 +1,8 @@
 import microtest
 from microtest.utils import Namespace
+
 import flask
-import blog.orm.manage as manage
+import blog.applications.blog as blog_application
 
 
 @microtest.reset
@@ -21,7 +22,7 @@ def test_init_db_cmd(app, db):
     
     items['init'] = dummy_init
 
-    with microtest.patch(manage, models = Namespace(items)):
+    with microtest.patch(blog_application.commands, models = Namespace(items)):
         result = runner.invoke(args=['init-db'])
         assert items['init_called']
         assert 'OK' in result.output

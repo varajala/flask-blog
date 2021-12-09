@@ -6,10 +6,8 @@ from flask import Flask
 import blog.applications.auth as auth_application
 import blog.applications.admin as admin_application
 import blog.applications.blog as blog_application
-import blog.models as models
 
-import blog.orm.manage
-import blog.security.manage
+import blog.models as models
 import blog.cli as cli
 
 
