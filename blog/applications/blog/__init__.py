@@ -2,9 +2,12 @@ import flask
 
 import blog.security as security
 import blog.models as models
-from blog.common import Timestamp
+from blog.common import Timestamp, path_relative_to_file
 
-blueprint = flask.Blueprint('blog', __name__)
+blueprint = flask.Blueprint(
+    'blog', __name__,
+    template_folder=path_relative_to_file(__file__, 'templates')
+    )
 
 
 @blueprint.route('/', methods=('GET',))

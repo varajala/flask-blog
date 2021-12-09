@@ -3,7 +3,9 @@ import sys
 from pathlib import Path
 from flask import Flask
 
-import blog.applications as applications
+import blog.applications.auth as auth_application
+import blog.applications.admin as admin_application
+import blog.applications.blog as blog_application
 import blog.models as models
 
 import blog.orm.manage
@@ -21,9 +23,9 @@ def create_app(test_config = None):
 
     app.teardown_appcontext(models.close_connection)
 
-    app.register_blueprint(applications.auth.blueprint)
-    app.register_blueprint(applications.admin.blueprint)
-    app.register_blueprint(applications.blog.blueprint)
+    app.register_blueprint(auth_application.blueprint)
+    app.register_blueprint(admin_application.blueprint)
+    app.register_blueprint(blog_application.blueprint)
     
     app.add_url_rule('/', endpoint='index')
 

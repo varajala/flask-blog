@@ -437,7 +437,7 @@ def send_verification_email(reciever: str, otp: bytes, expires: Timestamp, base_
         'expires':str(expires),
         'verify_url':base_url + flask.url_for('auth.verify')
     }
-    data = flask.render_template('verify_email_message.html', context=context)
+    data = flask.render_template('emails/verify_email_message.html', context=context)
     message = {
         'subject':'Your one time email verificatcion token',
         'content':(data, 'html')
@@ -455,7 +455,7 @@ def send_account_lock_email(reciever: str, otp: bytes, expires: Timestamp, base_
         'expires':str(expires),
         'unlock_url':base_url + flask.url_for('auth.unlock')
     }
-    data = flask.render_template('account_locked_message.html', context=context)
+    data = flask.render_template('emails/account_locked_message.html', context=context)
     message = {
         'subject':'Your account has been locked',
         'content':(data, 'html')
@@ -473,7 +473,7 @@ def send_password_reset_email(reciever: str, otp: bytes, expires: Timestamp, bas
         'expires':str(expires),
         'password_reset_url':base_url + flask.url_for('auth.reset_password')
     }
-    data = flask.render_template('account_locked_message.html', context=context)
+    data = flask.render_template('emails/account_locked_message.html', context=context)
     message = {
         'subject':'Your account has been locked',
         'content':(data, 'html')

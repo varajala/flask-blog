@@ -4,7 +4,7 @@ Common dataclasses.
 Author: Valtteri Rajalainen
 """
 
-
+import os
 import datetime
 import typing
 
@@ -12,8 +12,13 @@ import typing
 __all__ = [
     'Timestamp',
     'Session',
-    'Namespace'
+    'Namespace',
+    'path_relative_to_file',
     ]
+
+
+def path_relative_to_file(filepath: str, path: str) -> str:
+    return os.path.join(os.path.dirname(filepath), path)
 
 
 class Timestamp:

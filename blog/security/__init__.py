@@ -8,4 +8,3 @@ from blog.security.utils import (
     )
 from blog.security.auth import *
 from blog.security.sessions import *
-from blog.security.views import *

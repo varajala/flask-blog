@@ -2,9 +2,15 @@ import flask
 import blog.security as security
 import blog.security.sessions as sessions
 import blog.models as models
+from blog.common import path_relative_to_file
 
 
-blueprint = flask.Blueprint('admin', __name__, url_prefix='/admin')
+
+blueprint = flask.Blueprint(
+    'admin', __name__,
+    url_prefix='/admin',
+    template_folder=path_relative_to_file(__file__, 'templates')
+    )
 
 
 @blueprint.route('/', methods=('GET',))

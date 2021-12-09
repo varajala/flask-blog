@@ -2,10 +2,10 @@ import flask
 
 from blog.security.utils import *
 from blog.security.auth import *
+from blog.common import path_relative_to_file
 import blog.notifications as notifications
 import blog.security.sessions as sessions
 import blog.models as models
-
 
 __all__ = [
     'blueprint',
@@ -17,7 +17,11 @@ __all__ = [
 ]
 
 
-blueprint = flask.Blueprint('auth', __name__, url_prefix='/auth')
+blueprint = flask.Blueprint(
+    'auth', __name__,
+    url_prefix='/auth',
+    template_folder=path_relative_to_file(__file__, 'templates')
+    )
 
 
 @blueprint.route('/register', methods=('GET', 'POST'))
