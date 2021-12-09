@@ -29,4 +29,17 @@ def create_app(test_config = None):
 
     for command in cli.commands:
         app.cli.add_command(command)
+
+    if not os.path.exists(app.config['EMAIL_CREDENTIALS']):
+        sys.stdout.write('[ WARNING ]: Email credentials not found.\n')
+        sys.stdout.write('A placeholder file is created into: ')
+        sys.stdout.write(app.config['EMAIL_CREDENTIALS'] + '.\n\n')
+
+        with open(app.config['EMAIL_CREDENTIALS'], 'wb') as file:
+            file.write(b'email-address')
+            file.write(b'\n')
+            file.write(b'password')
+
+        app.config['EMAIL_HOST'] = (None, sys.stdout)
+    
     return app
