@@ -1,0 +1,17 @@
+<p>This email was sent because a new account was created to
+the flask_tutorial website with the email address: {{ context['reciever'] }}.
+</p>
+<br>
+<p>Please verify your email address by copying the verification token below and pasting it </p> 
+<a href="{{ context['verify_url'] }}">here.</a>
+<br>
+<br>
+<p>Your one time verification token:</p>
+<br>
+<p><b>{{ context['token']  }}</b></p>
+<br>
+<br>
+<p>This token expires {{ context['expires'] }}.</p>
+<br>
+<p><i>-- This message was sent automatically by flask_tutorial --</i></p>
+<br>

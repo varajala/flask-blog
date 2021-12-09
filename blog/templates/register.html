@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block nav %}
+<ul>
+    <li class="nav-item"><h1>Flask Tutorial App</h1></li>
+    {% if g.user %}
+    <li class="nav-item"><h2>{{ g.user.username }}</h2></li>
+    <li class="nav-item"><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+    {% else %}
+    <li class="nav-item"><a href="{{ url_for('auth.login') }}">Login</a></li>
+    {% endif %}
+</ul>
+{% endblock %}
+
+{% block body %}
+<div class="form-container">
+    <h1>Register</h1>
+    <form method='POST'>
+        <label for="email">Email:</label>
+        <br>
+        <input type="email" name="email" id="email" required>
+        <br><br>
+        
+        <label for="username">Username:</label>
+        <br>
+        <input type="text" name="username" id="username" required>
+        <br><br>
+        
+        <label for="password">Password:</label>
+        <br>
+        <input type="password" name="password1" id="password1" required>
+        <br><br>
+        
+        <label for="password">Verify the password:</label>
+        <br>
+        <input type="password" name="password2" id="password2" required>
+        <br><br>
+        
+        <input type="submit" value="Register">
+    </form>
+</div>
+{% endblock %}

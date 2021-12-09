@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block nav %}
+    <ul>
+        <li class="nav-item"><h1>Management</h1></li>
+        {% if g.user %}
+        <li class="nav-item"><a href="{{ url_for('index') }}">{{ g.user.username }}</a></li>
+        <li class="nav-item"><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+        {% else %}
+        <li class="nav-item"><a href="{{ url_for('auth.login') }}">Login</a></li>
+        <li class="nav-item"><a href="{{ url_for('auth.register') }}">Register</a></li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+{% block body %}
+<script src="{{ url_for('static', filename='manage_users.js') }}"></script>
+
+<form id="manage-user" method="POST">
+    <input name="csrf_token" value="{{csrf_token}}" hidden>
+</form>
+
+<script>
+    saveUserId("{{ user.id }}")
+</script>
+
+<div class="manage-container">
+    <label for="username">Username: </label><br>
+    <input form="manage-user" type="text" name="username" id="username" value="{{ user.username }}" disabled>
+    <button id="usernameBtn" onClick="editUsername()">Edit</button>
+
+    <br><br>
+
+    <label for="username">Email: </label><br>
+    <input form="manage-user" type="email" name="email" id="email" value="{{ user.email }}" disabled>
+    <button id="emailBtn" onClick="editEmail()">Edit</button>
+
+    <br><br>
+
+    {% if user.is_verified %}
+    <p>Verified</p>
+    {% else %}
+    <p>Not Verified</p>
+    <input form="manage-user" type="submit" formaction="{{ url_for('admin.verify_user', userid=user.id) }}" value="Verfiy">
+    {% endif %}
+
+    <br><br>
+
+    <input form="manage-user" type="submit" formaction="{{ url_for('admin.delete_user', userid=user.id) }}" value="Delete">
+    <input form="manage-user" type="submit" formaction="{{ url_for('admin.make_admin', userid=user.id) }}" value="Make admin">
+    
+    <br><br>
+    <br><br>
+    
+    <a style="text-decoration: underline; color: blueviolet;" href="{{ url_for('admin.index') }}">Back to users</a>
+</div>
+{% endblock %}

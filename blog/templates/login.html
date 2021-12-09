@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Log In{% endblock %}
+{% block nav %}
+<ul>
+    <li class="nav-item"><h1>Flask Tutorial App</h1></li>
+    {% if g.user %}
+    <li class="nav-item"><h2>{{ g.user.username }}</h2></li>
+    <li class="nav-item"><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+    {% else %}
+    <li class="nav-item"><a href="{{ url_for('auth.register') }}">Register</a></li>
+    {% endif %}
+</ul>
+{% endblock %}
+
+{% block body %}
+<div class="form-container">
+    <h1>Log in</h1>
+    <form method='POST'>
+        <label for="username">Username:</label>
+        <br>
+        <input type="text" name="username" id="username" required>
+        <br><br>
+        <label for="password">Password:</label>
+        <br>
+        <input type="password" name="password" id="password" required>
+        <br><br>
+        <input name="csrf_token" value="{{ csrf_token }}" hidden>
+        <input type="submit" value="Log In">
+    </form>
+
+    <a href="{{ url_for('auth.request_password_reset') }}" style="text-decoration: underline; color: darkslategray;">Reset password</a>
+</div>
+{% endblock %}

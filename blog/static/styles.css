@@ -1,0 +1,147 @@
+body {
+    margin: 0px 0px 0px 0px;
+    font-family: Dejavu Sans;
+}
+
+
+nav {
+    background-color: darkslategray;
+    height: max-content;
+}
+
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    text-align: center;
+    width: 75%;
+}
+
+
+.nav-item {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 25px;
+    padding-right: 25px;
+    display: inline-block;
+    font-family: Dejavu Sans;
+    color: #000000;
+}
+
+a {
+    font-size: 18px;
+    text-decoration: none;
+    color: #000000;
+}
+
+form {
+    padding-top: 2%;
+    padding-bottom: 2%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    text-align: center;
+}
+
+.text-input {
+    width: 60%;
+}
+
+
+.blog-feed {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    display: block;
+    width: 80%;
+}
+
+.blog-post {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 15px;
+    width: 100%;
+    border-radius: 5px;
+    font-family: Dejavu Sans;
+    background-color:lightgrey;
+}
+
+.blog-post-content {
+    text-align: left;
+}
+
+
+.blog-post-container {
+    width: 100%;
+    background-color:lightgrey;
+    display: inline-block;
+    text-align: left;
+}
+
+
+.timestamp {
+    color: darkslategrey;
+    font-family: Ubuntu Mono;
+}
+
+
+.form-container {
+    font-family: Dejavu Sans;
+    text-align: center;
+    width: 60%;
+    padding: 25px;
+    margin-top: 10%;
+    margin-bottom: 10%;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10px;
+    background-color:lightgrey;
+}
+
+
+.form-row {
+    width: 100%;
+    text-align: center;
+    margin-left: center;
+    margin-right: center;
+}
+
+
+.flash {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 25px;
+    background-color: #f0faf0;
+    text-align: center;
+    font-family: Ubuntu Mono;
+    border-radius: 5px;
+    width: 80%;
+}
+
+
+.manage-container {
+    padding-top: 2%;
+    padding-bottom: 2%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    text-align: center;
+}
+
+
+.manage-field {
+    padding: 15px;
+    display: inline;
+}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Unlock Account{% endblock %}
+{% block nav %}
+<ul>
+    <li class="nav-item"><h1>Flask Tutorial App</h1></li>
+    <li class="nav-item"><a href="{{ url_for('auth.login') }}">Login</a></li>
+    <li class="nav-item"><a href="{{ url_for('auth.register') }}">Register</a></li>
+</ul>
+{% endblock %}
+
+{% block body %}
+
+<div class="form-container">
+    <h1>Unlock your account</h1>
+    <p>A unique unlock token has been sent to your email.
+    Please insert your username and copy the token provided in the email to to the text field below.
+    </p>
+    <form method="POST">
+        <label for="username-field">Username:</label>
+        <br>
+        <input style="width: 90%; margin: 15px;" id="username-field" type="text" name="username" required>
+        <br>
+        <label for="token-field">Unlock token:</label>
+        <br>
+        <input style="width: 90%; margin: 15px;" id="token-field" type="text" name="unlock_token" required>
+        <br>
+        <br>
+        <input name="csrf_token" value="{{ csrf_token }}" hidden>
+        <input type="submit" value="Unlock">
+    </form>
+</div>
+{% endblock %}

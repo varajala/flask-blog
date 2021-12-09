@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Blog{% endblock %}
+{% block nav %}
+    <ul>
+        <li class="nav-item"><h1>Flask Tutorial App</h1></li>
+        {% if g.user %}
+        <li class="nav-item"><a href="{{ url_for('index') }}">{{ g.user.username }}</a></li>
+        {% if g.user.is_admin  %}
+            <li class="nav-item"><a href="{{ url_for('admin.index') }}">Management</a></li>
+        {% endif %}
+        <li class="nav-item"><a href="{{ url_for('auth.reset_password') }}">Change password</a></li>
+        <li class="nav-item"><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+        {% else %}
+        <li class="nav-item"><a href="{{ url_for('auth.login') }}">Login</a></li>
+        <li class="nav-item"><a href="{{ url_for('auth.register') }}">Register</a></li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+{% block body %}
+<script src="{{ url_for('static', filename='blog.js') }}"></script>
+
+<form id="create-post" action="/create" method='POST'>
+    <input class="text-input" type="text" name="text">
+    <input type="submit" value="Create">
+    <input name="csrf_token" value="{{csrf_token}}" hidden>
+</form>
+
+<div class="blog-feed">
+    {% for post in posts %}
+    <div id="{{ post.id }}" class="blog-post">
+        <p class="blog-post-content">{{ post.content }}</p>
+        <div class="blog-post-container">
+            <p class="timestamp">{{ post.created }}</p>
+            <button onClick="updatePost('{{ post.id }}')">Edit</button>
+            <button form="create-post" type="submit" formaction="/delete/{{ post.id }}">Delete</button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

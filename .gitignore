@@ -1,0 +1,11 @@
+# Virtual environment
+*venv
+
+# Pycache
+**__pycache__
+**.pyc
+
+# Other assets
+**.egg-info
+**.db
+

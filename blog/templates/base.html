@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% block head %}
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        {% endblock %}
+    </head>
+
+    <body>
+        <nav>
+        {% block nav %}
+        {% endblock %}
+        </nav>
+        
+        {% block body %}
+        {% endblock %}
+
+        {% for message in get_flashed_messages() %}
+        <div id="messages" class="flash">
+            <p>{{ message }}</p>
+            <button onClick="hideMessage()">OK</button>
+        </div>
+        {% endfor %}
+    </body>
+</html>

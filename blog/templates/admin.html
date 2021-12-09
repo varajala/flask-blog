@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block nav %}
+    <ul>
+        <li class="nav-item"><h1>Management</h1></li>
+        {% if g.user %}
+        <li class="nav-item"><a href="{{ url_for('index') }}">{{ g.user.username }}</a></li>
+        <li class="nav-item"><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+        {% else %}
+        <li class="nav-item"><a href="{{ url_for('auth.login') }}">Login</a></li>
+        <li class="nav-item"><a href="{{ url_for('auth.register') }}">Register</a></li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+{% block body %}
+<form id="create-user" action="users/create" method='POST'>
+    <label for="username">Username:</label>
+    <input type="text" name="username" id="username" required>
+    <label for="email">Email:</label>
+    <input type="email" name="email" id="email" required>
+    <label for="password">Password:</label>
+    <input type="password" name="password" id="password" required>
+    <input name="csrf_token" value="{{csrf_token}}" hidden>
+    <input type="submit" value="Create">
+</form>
+<div class="blog-feed">
+    {% for user in users %}
+    {% if not user.is_admin %}
+    <div id="{{ user.id }}" class="blog-post">
+        <a href="{{ url_for('admin.manage_user', userid=user.id) }}">{{ user.username }}</a>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}

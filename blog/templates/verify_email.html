@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Verify email{% endblock %}
+{% block nav %}
+<ul>
+    <li class="nav-item"><h1>Flask Tutorial App</h1></li>
+    {% if g.user %}
+    <li class="nav-item"><h2>{{ g.user.username }}</h2></li>
+    <li class="nav-item"><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+    {% endif %}
+</ul>
+{% endblock %}
+
+{% block body %}
+
+<div class="form-container">
+    <h1>Verify your email</h1>
+    <p>A verification email hs been sent to your email.
+    Please copy the verification token provided in the email to to the text field below.
+    </p>
+    <form method="POST">
+        <label for="token-field">Enter the verification token:</label>
+        <br>
+        <input style="width: 90%; margin: 15px;" id="token-field" type="text" name="verification_token">
+        <br>
+        <br>
+        <input type="submit" value="Verify">
+        <input name="csrf_token" value="{{ csrf_token }}" hidden>
+    </form>
+</div>
+{% endblock %}
