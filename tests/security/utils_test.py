@@ -1,5 +1,5 @@
 import microtest
-import flask_tutorial.security.utils as utils
+import blog.security.utils as utils
 
 
 @microtest.test

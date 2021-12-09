@@ -1,8 +1,8 @@
 import flask
 
-import flask_tutorial.security as security
-import flask_tutorial.models as models
-from flask_tutorial.common import Timestamp
+import blog.security as security
+import blog.models as models
+from blog.common import Timestamp
 
 blueprint = flask.Blueprint('blog', __name__)
 

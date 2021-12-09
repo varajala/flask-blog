@@ -1,14 +1,19 @@
 import sys
-from pathlib import Path
+import os
 
-
-filepath = Path(__file__)
 
 EMAIL_HOST = (None, sys.stdout)
-#EMAIL_HOST = ('smtp.gmail.com', 465),
+# EMAIL_HOST = ('smtp.gmail.com', 465),
 EMAIL_USE_SSL = True
-EMAIL_CREDENTIALS = '/home/varajala/dev/mail'
+EMAIL_CREDENTIALS = os.path.join(os.path.dirname(__file__), 'email-credentials')
 
-DATABASE = str(filepath.parent.joinpath('database.db'))
+DATABASE = os.path.join(os.path.dirname(__file__), 'database.db')
 
-SECRET_KEY = 'dev'
+SECRET_KEY = 'development'
+
+
+if not os.path.exists(EMAIL_CREDENTIALS):
+    with open(EMAIL_CREDENTIALS, 'wb') as file:
+        file.write(b'email-address')
+        file.write(b'\n')
+        file.write(b'password')

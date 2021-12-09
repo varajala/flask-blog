@@ -12,11 +12,11 @@ import hmac
 import werkzeug.security
 from werkzeug.security import check_password_hash
 
-from flask_tutorial.common import *
-from flask_tutorial.security.utils import *
-import flask_tutorial.notifications as notifications
-import flask_tutorial.security.sessions as sessions
-import flask_tutorial.models as models
+from blog.common import *
+from blog.security.utils import *
+import blog.notifications as notifications
+import blog.security.sessions as sessions
+import blog.models as models
 
 
 

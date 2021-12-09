@@ -1,1 +1,1 @@
-from flask_tutorial.orm.main import Database
+from blog.orm.main import Database

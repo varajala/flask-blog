@@ -5,11 +5,12 @@ import re
 import sys
 
 import microtest
-import flask_tutorial as application
-import flask_tutorial.orm as orm
+import blog as application
+import blog.orm as orm
 
 
-#microtest.exclude_groups('slow')
+# Uncomment to exclude tests marked as slow...
+# microtest.exclude_groups('slow')
 
 
 @microtest.utility
@@ -107,7 +108,7 @@ def create_test_app(database_path):
     app = application.create_app(config)
 
     with app.app_context():
-        application.models.init('flask_tutorial.schema')
+        application.models.init('blog.schema')
 
     return app
 

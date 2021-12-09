@@ -3,20 +3,20 @@ import sys
 from pathlib import Path
 from flask import Flask
 
-import flask_tutorial.security as security
-import flask_tutorial.blog as blog
-import flask_tutorial.admin as admin
-import flask_tutorial.models as models
+import blog.security as security
+import blog.blog_app as blog_app
+import blog.admin as admin
+import blog.models as models
 
-import flask_tutorial.orm.manage
-import flask_tutorial.security.manage
-from flask_tutorial.cli import commands
+import blog.orm.manage
+import blog.security.manage
+from blog.cli import commands
 
 
 def create_app(test_config = None):
     global database
     app = Flask(__name__)
-    app.config.from_object('flask_tutorial.config')
+    app.config.from_object('blog.config')
 
     if test_config:
         for key, value in test_config.items():
@@ -25,7 +25,7 @@ def create_app(test_config = None):
     app.teardown_appcontext(models.close_connection)
 
     app.register_blueprint(security.blueprint)
-    app.register_blueprint(blog.blueprint)
+    app.register_blueprint(blog_app.blueprint)
     app.register_blueprint(admin.blueprint)
     
     app.add_url_rule('/', endpoint='index')

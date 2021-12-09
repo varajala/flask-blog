@@ -23,9 +23,9 @@ import flask
 import codecs
 import hmac
 
-from flask_tutorial.common import Timestamp, Session
-from flask_tutorial.security.utils import *
-import flask_tutorial.models as models
+from blog.common import Timestamp, Session
+from blog.security.utils import *
+import blog.models as models
 
 
 __all__ = [

@@ -10,8 +10,8 @@ Author: Valtteri Rajalainen
 import sqlite3
 import os
 import runpy
-import flask_tutorial.orm.sql as sql
-from flask_tutorial.common import Namespace
+import blog.orm.sql as sql
+from blog.common import Namespace
 
 
 class Table:

@@ -1,7 +1,7 @@
 import sys
 import flask
 from types import ModuleType
-import flask_tutorial.orm as orm
+import blog.orm as orm
 
 
 class Module(ModuleType):

@@ -9,7 +9,7 @@ import base64
 from contextlib import suppress
 from threading import Lock
 
-import flask_tutorial.notifications as notifications
+import blog.notifications as notifications
 
 
 LOCALHOST = '127.0.0.1'

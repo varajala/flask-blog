@@ -1,10 +1,10 @@
 import flask
 
-from flask_tutorial.security.utils import *
-from flask_tutorial.security.auth import *
-import flask_tutorial.notifications as notifications
-import flask_tutorial.security.sessions as sessions
-import flask_tutorial.models as models
+from blog.security.utils import *
+from blog.security.auth import *
+import blog.notifications as notifications
+import blog.security.sessions as sessions
+import blog.models as models
 
 
 __all__ = [

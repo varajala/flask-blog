@@ -2,9 +2,9 @@ import click
 import flask
 from flask.cli import with_appcontext
 
-import flask_tutorial.cli as cli
-import flask_tutorial.security as security
-import flask_tutorial.models as models
+import blog.cli as cli
+import blog.security as security
+import blog.models as models
 
 
 @cli.register
@@ -12,7 +12,7 @@ import flask_tutorial.models as models
 @with_appcontext
 def init_database():
     try:
-        models.init('flask_tutorial.schema')
+        models.init('blog.schema')
     
     except Exception as err:
         print(err)

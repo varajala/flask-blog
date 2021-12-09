@@ -1,8 +1,8 @@
 import microtest
 import flask
-from flask_tutorial.security import *
-import flask_tutorial.security.sessions as sessions
-from flask_tutorial.common import Timestamp
+from blog.security import *
+import blog.security.sessions as sessions
+from blog.common import Timestamp
 
 
 username = 'testing_sessions_and_auth'

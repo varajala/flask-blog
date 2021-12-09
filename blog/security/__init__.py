@@ -1,4 +1,4 @@
-from flask_tutorial.security.utils import (
+from blog.security.utils import (
     check_password_hash,
     generate_password_hash,
     matching_tokens,
@@ -6,6 +6,6 @@ from flask_tutorial.security.utils import (
     valid_email,
     valid_password
     )
-from flask_tutorial.security.auth import *
-from flask_tutorial.security.sessions import *
-from flask_tutorial.security.views import *
+from blog.security.auth import *
+from blog.security.sessions import *
+from blog.security.views import *

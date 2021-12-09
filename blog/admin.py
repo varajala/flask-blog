@@ -1,7 +1,7 @@
 import flask
-import flask_tutorial.security as security
-import flask_tutorial.security.sessions as sessions
-import flask_tutorial.models as models
+import blog.security as security
+import blog.security.sessions as sessions
+import blog.models as models
 
 
 blueprint = flask.Blueprint('admin', __name__, url_prefix='/admin')

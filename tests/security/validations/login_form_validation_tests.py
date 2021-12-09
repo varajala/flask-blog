@@ -1,10 +1,10 @@
 import microtest
 import flask
-import flask_tutorial.security as security
-import flask_tutorial.security.auth as auth
+import blog.security as security
+import blog.security.auth as auth
 
-from flask_tutorial.common import Session, Timestamp
-from flask_tutorial.security import generate_password_hash
+from blog.common import Session, Timestamp
+from blog.security import generate_password_hash
 
 
 username = 'user0001'

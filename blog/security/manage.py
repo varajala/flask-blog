@@ -2,9 +2,9 @@ import click
 import flask
 from flask.cli import with_appcontext
 
-import flask_tutorial.cli as cli
-import flask_tutorial.security.utils as utils
-import flask_tutorial.models as models
+import blog.cli as cli
+import blog.security.utils as utils
+import blog.models as models
 
 
 @cli.register
