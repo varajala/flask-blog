@@ -19,7 +19,7 @@ from typing import (
 
 
 Response = flask_types.ResponseValue
-ViewFunction = Callable[[Any], Response]
+ViewFunction = types.Union[Callable[[], Response], Callable[[Any], Response]]
 
 Module = ModuleType
 

@@ -9,8 +9,6 @@ import flask
 import functools
 import os
 import hmac
-import werkzeug.security
-from werkzeug.security import check_password_hash
 
 from blog.common import *
 from blog.security.utils import *
@@ -54,7 +52,7 @@ def admin_only(view: types.ViewFunction) -> types.ViewFunction:
     return wrapper
 
 
-def authentication_required(view: ViewFunction) -> ViewFunction:
+def authentication_required(view: types.ViewFunction) -> types.ViewFunction:
     """
     Check if the session is authenticated (userid > 0)
     and that the user is verified.
@@ -78,7 +76,7 @@ def authentication_required(view: ViewFunction) -> ViewFunction:
     return wrapper
 
 
-def only_login_required(view: ViewFunction) -> ViewFunction:
+def only_login_required(view: types.ViewFunction) -> types.ViewFunction:
     """
     Check if the session is authenticated (userid > 0).
     Redirect to login if not.
@@ -377,7 +375,7 @@ def unlock_user_account(form: types.Dict[str, str], session: Session) -> types.O
     return message
 
 
-def record_login_attempt(form: types.Dict[str, str]) -> types.Tuple[Namespace, bool]:
+def record_login_attempt(form: types.Dict[str, str]) -> types.Tuple[types.Optional[Namespace], bool]:
     username = form.get('username', '')
     user = models.users.get(username = username)
     maxed_out = False
@@ -423,7 +421,7 @@ def is_valid_password_reset_request(form: types.Dict[str, str], session: Session
     return all(conditions)
 
 
-def generate_otp(user_id: int, otp_type: str, lifetime: int) -> types.Tuple[Namespace, Timestamp]:
+def generate_otp(user_id: int, otp_type: str, lifetime: int) -> types.Tuple[bytes, Timestamp]:
     if otp_type not in OTP_TYPES:
         raise TypeError('Invalid OTP type.')
     
@@ -441,7 +439,7 @@ def generate_otp(user_id: int, otp_type: str, lifetime: int) -> types.Tuple[Name
     return otp, expires
 
 
-def send_verification_email(reciever: str, otp: Namespace, expires: Timestamp, base_url: str):
+def send_verification_email(reciever: str, otp: bytes, expires: Timestamp, base_url: str):
     context = {
         'reciever':reciever,
         'token':otp.hex(),
@@ -459,7 +457,7 @@ def send_verification_email(reciever: str, otp: Namespace, expires: Timestamp, b
     notifications.send_email(message, reciever, host, credentials_path, use_ssl)
 
 
-def send_account_lock_email(reciever: str, otp: Namespace, expires: Timestamp, base_url: str):
+def send_account_lock_email(reciever: str, otp: bytes, expires: Timestamp, base_url: str):
     context = {
         'reciever':reciever,
         'token':otp.hex(),
@@ -477,7 +475,7 @@ def send_account_lock_email(reciever: str, otp: Namespace, expires: Timestamp, b
     notifications.send_email(message, reciever, host, credentials_path, use_ssl)
 
 
-def send_password_reset_email(reciever: str, otp: Namespace, expires: Timestamp, base_url: str):
+def send_password_reset_email(reciever: str, otp: bytes, expires: Timestamp, base_url: str):
     context = {
         'reciever':reciever,
         'token':otp.hex(),

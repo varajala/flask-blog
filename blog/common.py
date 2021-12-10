@@ -129,7 +129,7 @@ class Timestamp:
 
 
 class Session:
-    def __init__(self, session_id: int, csrf_token: bytes, expires: Timestamp, user_id: int):
+    def __init__(self, session_id: bytes, csrf_token: bytes, expires: Timestamp, user_id: int):
         self.id = session_id
         self.csrf_token = csrf_token
         self.expires = expires

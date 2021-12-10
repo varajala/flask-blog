@@ -1,19 +1,6 @@
 """
 Functions related to session handling.
 
-About the implementation:
-
-Sessions are implemented as server side sessions. (Flask defaults to client side sessions.)
-The only item stored in client side is the sessionid, 256 bit key in hex format.
-
-Every user is linked to a single session. When user is not authenticated, the
-user_id in the session is 0. When user is authenticated, the anonymus session is
-ended and a new session is started. When logging out, the authenticated session is ended
-and new anonymous session is created.
-
-CSRF-tokens are linked to the session, not single forms.
-The session is always stored in the flask.g object.
-
 Author: Valtteri Rajalainen
 """
 
@@ -23,9 +10,15 @@ import flask
 import codecs
 import hmac
 
+import blog.typing as types
 from blog.common import Timestamp, Session
 from blog.security.utils import *
-import blog.models as models
+
+if types.TYPE_CHECKING:
+    import blog.models
+    models = types.cast(blog.models.Module, blog.models)
+else:
+    import blog.models as models
 
 
 __all__ = [
@@ -35,7 +28,7 @@ __all__ = [
 ]
 
 
-def create_new_session(userid = 0):
+def create_new_session(userid: int = 0) -> Session:
     """
     Create and store new session linked to the given userid.
     Returns a Session object.
@@ -66,7 +59,7 @@ def create_new_session(userid = 0):
     return Session(session_id, csrf_token, expires, userid)
 
 
-def get_session_by_id(session_id):
+def get_session_by_id(session_id: bytes) -> types.Optional[Session]:
     row = models.sessions.get(session_id = session_id)
     if not row:
         return None
@@ -80,11 +73,11 @@ def get_session_by_id(session_id):
     return session
 
 
-def end_session(session_id):
+def end_session(session_id: bytes):
     models.sessions.delete(session_id = session_id)
 
 
-def load_user_session(raw_session_id):
+def load_user_session(raw_session_id: str) -> Session:
     """
     Always returns a Session object.
 
@@ -98,11 +91,12 @@ def load_user_session(raw_session_id):
         session_id = bytes.fromhex(raw_session_id)
     
     except (ValueError, TypeError):
-        session = create_new_session()
+        return create_new_session()
 
     else:
         session = get_session_by_id(session_id)
-        if session is None or session.is_expired:
-            session = create_new_session()
-
-    return session
+        if session is None:
+            return create_new_session()
+        if session.is_expired:
+            return create_new_session()
+        return session

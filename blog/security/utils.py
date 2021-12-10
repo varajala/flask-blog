@@ -39,11 +39,11 @@ OTP_TYPES = (
     )
 
 
-def matching_tokens(src, cmp):
+def matching_tokens(src: bytes, cmp: bytes) -> bool:
     return hmac.compare_digest(src, cmp)
 
 
-def check_password_hash(password_hash, provided_password):
+def check_password_hash(password_hash: str, provided_password: str) -> bool:
     return werkzeug.security.check_password_hash(password_hash, provided_password)
 
 
@@ -73,4 +73,4 @@ def valid_password(password: str) -> bool:
     if len(password) > PASSWORD_MAX_LENGTH:
         return False
     password_exp = re.compile(r'[^\s]+')
-    return re.fullmatch(password_exp, password)
+    return re.fullmatch(password_exp, password) is not None
