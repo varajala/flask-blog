@@ -1,9 +1,9 @@
 import microtest
 import flask
-import blog.security as security
-import blog.security.auth as auth
+import flask_blog.security as security
+import flask_blog.security.auth as auth
 
-from blog.common import Session, Timestamp
+from flask_blog.common import Session, Timestamp
 
 
 username = 'user001'

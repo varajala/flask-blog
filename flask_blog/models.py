@@ -1,7 +1,7 @@
 import flask
 import sys
-import blog.typing as types
-import blog.orm as orm
+import flask_blog.typing as types
+import flask_blog.orm as orm
 
 
 def create_and_store_database_object() -> types.DatabaseObject:

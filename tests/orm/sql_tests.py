@@ -1,5 +1,5 @@
 import microtest
-import blog.orm.sql as sql
+import flask_blog.orm.sql as sql
 
 
 @microtest.test

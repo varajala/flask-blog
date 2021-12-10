@@ -1,17 +1,17 @@
 import flask
-from blog.security.utils import *
-from blog.security.auth import *
-from blog.common import path_relative_to_file
-import blog.typing as types
-import blog.notifications as notifications
-import blog.security.sessions as sessions
+from flask_blog.security.utils import *
+from flask_blog.security.auth import *
+from flask_blog.common import path_relative_to_file
+import flask_blog.typing as types
+import flask_blog.notifications as notifications
+import flask_blog.security.sessions as sessions
 
 
 if types.TYPE_CHECKING:
-    import blog.models
-    models = types.cast(blog.models.Module, blog.models)
+    import flask_blog.models
+    models = types.cast(flask_blog.models.Module, flask_blog.models)
 else:
-    import blog.models as models
+    import flask_blog.models as models
 
 
 __all__ = [

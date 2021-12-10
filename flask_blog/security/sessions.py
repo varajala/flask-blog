@@ -10,15 +10,15 @@ import flask
 import codecs
 import hmac
 
-import blog.typing as types
-from blog.common import Timestamp, Session
-from blog.security.utils import *
+import flask_blog.typing as types
+from flask_blog.common import Timestamp, Session
+from flask_blog.security.utils import *
 
 if types.TYPE_CHECKING:
-    import blog.models
-    models = types.cast(blog.models.Module, blog.models)
+    import flask_blog.models
+    models = types.cast(flask_blog.models.Module, flask_blog.models)
 else:
-    import blog.models as models
+    import flask_blog.models as models
 
 
 __all__ = [

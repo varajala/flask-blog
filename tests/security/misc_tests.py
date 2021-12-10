@@ -1,6 +1,6 @@
 import microtest
 import flask
-import blog.security as security
+import flask_blog.security as security
 
 
 ignore_in_csrf_check = [

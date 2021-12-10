@@ -2,15 +2,15 @@ import click
 import flask
 from flask.cli import with_appcontext
 
-import blog.cli as cli
-import blog.security.utils as utils
-import blog.typing as types
+import flask_blog.cli as cli
+import flask_blog.security.utils as utils
+import flask_blog.typing as types
 
 if types.TYPE_CHECKING:
-    import blog.models
-    models = types.cast(blog.models.Module, blog.models)
+    import flask_blog.models
+    models = types.cast(flask_blog.models.Module, flask_blog.models)
 else:
-    import blog.models as models
+    import flask_blog.models as models
 
 
 

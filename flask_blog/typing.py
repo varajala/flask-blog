@@ -1,5 +1,5 @@
 import flask.typing as flask_types
-from blog.orm import Table, Database
+from flask_blog.orm import Table, Database
 
 from types import ModuleType
 from typing import (

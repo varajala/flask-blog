@@ -1,14 +1,14 @@
 import flask
-import blog.security as security
-import blog.typing as types
-from blog.common import Timestamp, path_relative_to_file
+import flask_blog.security as security
+import flask_blog.typing as types
+from flask_blog.common import Timestamp, path_relative_to_file
 
 
 if types.TYPE_CHECKING:
-    import blog.models
-    models = types.cast(blog.models.Module, blog.models)
+    import flask_blog.models
+    models = types.cast(flask_blog.models.Module, flask_blog.models)
 else:
-    import blog.models as models
+    import flask_blog.models as models
 
 
 blueprint = flask.Blueprint(

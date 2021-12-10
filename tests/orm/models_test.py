@@ -1,7 +1,7 @@
 import microtest
 import flask
-import blog.orm.main as orm
-import blog.models as models
+import flask_blog.orm.main as orm
+import flask_blog.models as models
 
 
 @microtest.test

@@ -3,8 +3,8 @@ import tempfile
 import os
 import random
 
-from blog.orm.main import *
-from blog.orm.sql import *
+from flask_blog.orm.main import *
+from flask_blog.orm.sql import *
 
 
 fd = None

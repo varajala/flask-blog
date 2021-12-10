@@ -1,0 +1,1 @@
+from flask_blog.orm.main import Database, Table

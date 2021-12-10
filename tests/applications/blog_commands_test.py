@@ -2,7 +2,7 @@ import microtest
 from microtest.utils import Namespace
 
 import flask
-import blog.applications.blog as blog_application
+import flask_blog.applications.blog as blog_application
 
 
 @microtest.reset

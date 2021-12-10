@@ -2,17 +2,17 @@ import os
 import sys
 from flask import Flask
 
-import blog.applications.auth as auth_application
-import blog.applications.admin as admin_application
-import blog.applications.blog as blog_application
+import flask_blog.applications.auth as auth_application
+import flask_blog.applications.admin as admin_application
+import flask_blog.applications.blog as blog_application
 
-import blog.models as models
-import blog.cli as cli
+import flask_blog.models as models
+import flask_blog.cli as cli
 
 
 def create_app(test_config = None):
     app = Flask(__name__)
-    app.config.from_object('blog.config')
+    app.config.from_object('flask_blog.config')
 
     if test_config:
         for key, value in test_config.items():

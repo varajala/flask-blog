@@ -2,16 +2,16 @@ import click
 import flask
 from flask.cli import with_appcontext
 
-import blog.cli as cli
-import blog.security as security
-import blog.typing as types
+import flask_blog.cli as cli
+import flask_blog.security as security
+import flask_blog.typing as types
 
 
 if types.TYPE_CHECKING:
-    import blog.models
-    models = types.cast(blog.models.Module, blog.models)
+    import flask_blog.models
+    models = types.cast(flask_blog.models.Module, flask_blog.models)
 else:
-    import blog.models as models
+    import flask_blog.models as models
 
 
 @cli.register
@@ -19,7 +19,7 @@ else:
 @with_appcontext
 def init_database():
     try:
-        models.init_database('blog.schema')
+        models.init_database('flask_blog.schema')
     
     except Exception as err:
         print(err)

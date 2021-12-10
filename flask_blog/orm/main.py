@@ -12,8 +12,8 @@ import os
 import runpy
 import typing
 
-import blog.orm.sql as sql
-from blog.common import Namespace
+import flask_blog.orm.sql as sql
+from flask_blog.common import Namespace
 
 
 class Table:

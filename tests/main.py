@@ -5,8 +5,8 @@ import re
 import sys
 
 import microtest
-import blog as application
-import blog.orm as orm
+import flask_blog as application
+import flask_blog.orm as orm
 
 
 # Uncomment to exclude tests marked as slow...
@@ -108,7 +108,7 @@ def create_test_app(database_path):
     app = application.create_app(config)
 
     with app.app_context():
-        application.models.init_database('blog.schema')
+        application.models.init_database('flask_blog.schema')
 
     return app
 

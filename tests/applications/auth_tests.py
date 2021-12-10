@@ -3,11 +3,11 @@ import flask
 import tempfile
 from threading import Lock
 
-import blog.security.sessions as sessions
-import blog.notifications as notifications
-import blog.security.auth as auth
-from blog.security import generate_password_hash
-from blog.common import Timestamp
+import flask_blog.security.sessions as sessions
+import flask_blog.notifications as notifications
+import flask_blog.security.auth as auth
+from flask_blog.security import generate_password_hash
+from flask_blog.common import Timestamp
 
 
 mutex = Lock()
