@@ -12,7 +12,7 @@ import blog.models as models
 @with_appcontext
 def init_database():
     try:
-        models.init('blog.schema')
+        models.init_database('blog.schema')
     
     except Exception as err:
         print(err)

@@ -108,7 +108,7 @@ def create_test_app(database_path):
     app = application.create_app(config)
 
     with app.app_context():
-        application.models.init('blog.schema')
+        application.models.init_database('blog.schema')
 
     return app
 

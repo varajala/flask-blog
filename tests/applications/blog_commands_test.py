@@ -20,7 +20,7 @@ def test_init_db_cmd(app, db):
         nonlocal items
         items['init_called'] = True
     
-    items['init'] = dummy_init
+    items['init_database'] = dummy_init
 
     with microtest.patch(blog_application.commands, models = Namespace(items)):
         result = runner.invoke(args=['init-db'])
@@ -42,4 +42,4 @@ def test_create_user_cmd(app, db):
     result = runner.invoke(args=cmd)
     assert 'OK' in result.output
 
-    assert db.users.get(username = 'user') is not None
+    assert db.get_table('users').get(username = 'user') is not None

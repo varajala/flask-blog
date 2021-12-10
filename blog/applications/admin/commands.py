@@ -13,7 +13,7 @@ import blog.models as models
 @click.option('--email', prompt='Email address')
 @click.option('--password', prompt='Password', hide_input=True, confirmation_prompt=True)
 @with_appcontext
-def create_admin_user(username, email, password):
+def create_admin_user(username: str, email: str, password: str):
     if not utils.valid_username(username):
         click.secho('ERROR ', fg='red', nl=False)
         info = f'Failed to create a new user. Username {username} is invalid.\n'

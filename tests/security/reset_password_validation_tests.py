@@ -32,14 +32,14 @@ auth_session = Session(
 def reset(app, db):
     with app.app_context():
         db.reset()
-        db.users.insert(
+        db.get_table('users').insert(
             id = 1,
             username = username,
             email = email,
             password = password_hash,
             is_verified = 1,
             )
-        db.otps.insert(
+        db.get_table('otps').insert(
             user_id = 1,
             value = reset_token,
             expires = str(Timestamp(1)),
@@ -53,13 +53,13 @@ def cleanup(db, app):
 
 
 def setup_request_args(db):
-    db.sessions.insert(
+    db.get_table('sessions').insert(
         session_id = auth_session.id,
         user_id = 1,
         expires = str(auth_session.expires),
         csrf_token = auth_session.csrf_token
         )
-    flask.g.user = db.users.get(id = 1)
+    flask.g.user = db.get_table('users').get(id = 1)
 
 
 @microtest.test
@@ -76,7 +76,7 @@ def test_valid_password_reset_anon(app, db):
 
         err = auth.validate_password_reset(form, anon_session)
         assert err is None
-        assert db.otps.get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is None
+        assert db.get_table('otps').get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is None
 
 
 @microtest.test
@@ -93,7 +93,7 @@ def test_password_reset_anon_invalid_username(app, db):
 
         err = auth.validate_password_reset(form, anon_session)
         assert err is not None
-        assert db.otps.get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is not None
+        assert db.get_table('otps').get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is not None
 
 
 @microtest.test
@@ -110,7 +110,7 @@ def test_password_reset_anon_invalid_email(app, db):
 
         err = auth.validate_password_reset(form, anon_session)
         assert err is not None
-        assert db.otps.get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is not None
+        assert db.get_table('otps').get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is not None
 
 
 @microtest.test
@@ -127,7 +127,7 @@ def test_password_reset_anon_invalid_otp(app, db):
 
         err = auth.validate_password_reset(form, anon_session)
         assert err is not None
-        assert db.otps.get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is not None
+        assert db.get_table('otps').get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is not None
 
 
 @microtest.test
@@ -144,13 +144,13 @@ def test_password_reset_anon_invalid_csrf_token(app, db):
 
         err = auth.validate_password_reset(form, anon_session)
         assert err is not None
-        assert db.otps.get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is not None
+        assert db.get_table('otps').get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is not None
 
 
 @microtest.test
 def test_password_reset_anon_user_locked(app, db):
     with app.app_context():
-        with db.users.update(id = 1) as user:
+        with db.get_table('users').update(id = 1) as user:
             user.is_locked = 1
         
         form =  {
@@ -164,13 +164,13 @@ def test_password_reset_anon_user_locked(app, db):
 
         err = auth.validate_password_reset(form, anon_session)
         assert err is not None
-        assert db.otps.get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is not None
+        assert db.get_table('otps').get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is not None
 
 
 @microtest.test
 def test_password_reset_anon_user_not_verified(app, db):
     with app.app_context():
-        with db.users.update(id = 1) as user:
+        with db.get_table('users').update(id = 1) as user:
             user.is_verified = 0
         
         form =  {
@@ -184,13 +184,13 @@ def test_password_reset_anon_user_not_verified(app, db):
 
         err = auth.validate_password_reset(form, anon_session)
         assert err is not None
-        assert db.otps.get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is not None
+        assert db.get_table('otps').get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is not None
 
 
 @microtest.test
 def test_password_reset_anon_user_no_otp(app, db):
     with app.app_context():
-        db.otps.delete()
+        db.get_table('otps').delete()
         form =  {
             'username': username,
             'email': email,
@@ -207,7 +207,7 @@ def test_password_reset_anon_user_no_otp(app, db):
 @microtest.test
 def test_password_reset_anon_invalid_new_password(app, db):
     with app.app_context():
-        with db.otps.update(user_id = 1, type = auth.OTP.PASSWORD_RESET) as otp:
+        with db.get_table('otps').update(user_id = 1, type = auth.OTP.PASSWORD_RESET) as otp:
             otp.expires = str(Timestamp(-1))
         
         form =  {
@@ -226,7 +226,7 @@ def test_password_reset_anon_invalid_new_password(app, db):
 @microtest.test
 def test_password_reset_anon_passwords_dont_match(app, db):
     with app.app_context():
-        with db.otps.update(user_id = 1, type = auth.OTP.PASSWORD_RESET) as otp:
+        with db.get_table('otps').update(user_id = 1, type = auth.OTP.PASSWORD_RESET) as otp:
             otp.expires = str(Timestamp(-1))
         
         form =  {
@@ -245,7 +245,7 @@ def test_password_reset_anon_passwords_dont_match(app, db):
 @microtest.test
 def test_password_reset_anon_expired_otp(app, db):
     with app.app_context():
-        with db.otps.update(user_id = 1, type = auth.OTP.PASSWORD_RESET) as otp:
+        with db.get_table('otps').update(user_id = 1, type = auth.OTP.PASSWORD_RESET) as otp:
             otp.expires = str(Timestamp(-1))
         
         form =  {
@@ -259,7 +259,7 @@ def test_password_reset_anon_expired_otp(app, db):
 
         err = auth.validate_password_reset(form, anon_session)
         assert err is not None
-        assert db.otps.get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is None
+        assert db.get_table('otps').get(user_id = 1, type = auth.OTP.PASSWORD_RESET) is None
 
 
 @microtest.test
@@ -330,7 +330,7 @@ def test_password_reset_auth_invalid_new_password_confirm(app, db):
 def test_password_reset_auth_user_not_verified(app, db):
     with app.app_context():
         with app.test_request_context():
-            with db.users.update(id = 1) as user:
+            with db.get_table('users').update(id = 1) as user:
                 user.is_verified = 0
             
             form =  {

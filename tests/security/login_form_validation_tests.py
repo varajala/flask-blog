@@ -21,7 +21,11 @@ session = Session(
 
 @microtest.setup
 def setup(db, app):
-    db.users.insert(username=username, email=email, password=security.generate_password_hash(password))
+    db.get_table('users').insert(
+        username=username,
+        email=email,
+        password=security.generate_password_hash(password)
+        )
 
 
 @microtest.cleanup

@@ -13,7 +13,7 @@ password = '12345678'
 
 @microtest.setup
 def setup(db):
-    db.users.insert(
+    db.get_table('users').insert(
         username=username,
         email='test.user@mail.com',
         password=security.generate_password_hash(password),

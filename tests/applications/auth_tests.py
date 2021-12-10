@@ -44,8 +44,10 @@ def test_registering(app, db):
     password = 'strongpassword'
     username = 'register_test'
     email = 'test@mail.com'
+
+    users_table = db.get_table('users')
     
-    db.users.insert(
+    users_table.insert(
         username=username,
         email=email,
         password=generate_password_hash(password)
@@ -54,14 +56,14 @@ def test_registering(app, db):
     response = client.register_as('some_user', 'some@mail.com', password)
     assert '/auth/login' in response.headers['Location']
 
-    row = db.users.get(username='some_user')
+    row = users_table.get(username='some_user')
     assert row is not None
     assert not bool(row.is_verified)
     user_email = row.email
 
-    assert db.sessions.get(user_id = row.id) is None
+    assert db.get_table('sessions').get(user_id = row.id) is None
 
-    otp = db.otps.get(user_id = row.id)
+    otp = db.get_table('otps').get(user_id = row.id)
     assert otp is not None
     token = otp.value.hex()
 
@@ -82,7 +84,9 @@ def test_authentication(app, db):
     username = 'login_test'
     email = 'test@mail.com'
     
-    db.users.insert(
+    users_table = db.get_table('users')
+
+    users_table.insert(
         id = 1,
         username=username,
         email=email,
@@ -92,7 +96,7 @@ def test_authentication(app, db):
     
     response = client.login_as(username, password)
     assert 'http://localhost/' == response.headers['Location']
-    assert db.sessions.get(user_id = 1) is not None
+    assert db.get_table('sessions').get(user_id = 1) is not None
 
     with client:
         response = client.get('/')
@@ -106,7 +110,7 @@ def test_authentication(app, db):
         assert response.status_code == 302
         assert 'logout' in response.headers['Location']
 
-        with db.users.update(username = username) as user:
+        with users_table.update(username = username) as user:
             user.is_verified = 0
 
         response = client.get('/auth/login')
@@ -123,7 +127,9 @@ def test_logout(app, db):
     username = 'logout_test'
     email = 'test@mail.com'
     
-    db.users.insert(
+    sessions_table = db.get_table('sessions')
+
+    db.get_table('users').insert(
         id = 1,
         username=username,
         email=email,
@@ -131,13 +137,13 @@ def test_logout(app, db):
         )
     
     client.login_as(username, password)
-    assert db.sessions.get(user_id = 1) is not None
+    assert sessions_table.get(user_id = 1) is not None
 
     client.logout(find_csrf_token=False)
-    assert db.sessions.get(user_id = 1) is not None
+    assert sessions_table.get(user_id = 1) is not None
 
     client.logout()
-    assert db.sessions.get(user_id = 1) is None
+    assert sessions_table.get(user_id = 1) is None
 
 
 @microtest.group('slow')
@@ -145,12 +151,13 @@ def test_logout(app, db):
 def test_user_verification(app, db):
     client = TestClient(app)
     
-    db.users.insert(
+    users_table = db.get_table('users')
+    users_table.insert(
         username='user',
         email='test@mail.com',
         password=generate_password_hash('123')
         )
-    user = db.users.get(username = 'user')
+    user = users_table.get(username = 'user')
     client.login_as('user', '123')
 
     with app.app_context():
@@ -167,14 +174,15 @@ def test_user_verification(app, db):
     response = client.post('/auth/verify', data=form_data)
     assert 'http://localhost/' == response.headers['Location']
 
-    assert db.users.get(id = user.id).is_verified
+    assert users_table.get(id = user.id).is_verified
 
 
 @microtest.group('slow')
 @microtest.test
 def test_login_attempt_recording(app, db):
     client = TestClient(app)
-    db.users.insert(
+    users_table = db.get_table('users')
+    users_table.insert(
         id = 1,
         username='user',
         email='test@mail.com',
@@ -185,12 +193,12 @@ def test_login_attempt_recording(app, db):
     msg_start = file.tell()
     with microtest.patch(auth, MAX_LOGIN_ATTEMPTS = 1):
         client.login_as('user', '')
-        user = db.users.get(id = 1)
+        user = users_table.get(id = 1)
         assert not user.is_locked
         assert user.login_attempts == 1
 
         client.login_as('user', '')
-        user = db.users.get(id = 1)
+        user = users_table.get(id = 1)
         assert user.is_locked
         assert user.login_attempts == 2
 
@@ -199,17 +207,17 @@ def test_login_attempt_recording(app, db):
             email = file.read()
         
         assert f'To: {user.email}' in email
-        otp = db.otps.get(user_id = user.id, type = auth.OTP.ACCOUNT_LOCK)
+        otp = db.get_table('otps').get(user_id = user.id, type = auth.OTP.ACCOUNT_LOCK)
         assert otp.value.hex() in email
 
         client.login_as('user', '123')
-        assert db.sessions.get(user_id = 1) is None
+        assert db.get_table('sessions').get(user_id = 1) is None
 
 
 @microtest.group('slow')
 @microtest.test
 def test_account_unlocking(app, db):
-    db.users.insert(
+    db.get_table('users').insert(
         id = 1,
         username='user',
         email='test@mail.com',
@@ -217,7 +225,7 @@ def test_account_unlocking(app, db):
         is_locked = 1,
         )
 
-    db.otps.insert(
+    db.get_table('otps').insert(
         user_id = 1,
         value = b'\x00\x01',
         type = auth.OTP.ACCOUNT_LOCK,
@@ -236,7 +244,7 @@ def test_account_unlocking(app, db):
         }
         response = client.post('/auth/unlock', data=data)
     
-    user = db.users.get(id = 1)
+    user = db.get_table('users').get(id = 1)
     assert not user.is_locked
     
     try:
@@ -249,7 +257,7 @@ def test_account_unlocking(app, db):
 @microtest.group('slow')
 @microtest.test
 def test_requesting_password_reset(app, db):
-    db.users.insert(
+    db.get_table('users').insert(
         id = 1,
         username='user',
         email='test@mail.com',
@@ -272,7 +280,7 @@ def test_requesting_password_reset(app, db):
         }
         client.post('/auth/reset-password/request', data=data)
 
-    otp = db.otps.get(user_id = 1)
+    otp = db.get_table('otps').get(user_id = 1)
     assert otp is not None
 
     with mutex:
@@ -288,14 +296,14 @@ def test_requesting_password_reset(app, db):
 def test_anonymous_password_reset(app, db):
     password = '123'
     new_password = '12345678'
-    db.users.insert(
+    db.get_table('users').insert(
         id = 1,
         username='user',
         email='test@mail.com',
         password=generate_password_hash(password),
         is_verified = 1,
         )
-    db.otps.insert(
+    db.get_table('otps').insert(
         value = b'\x00\x01',
         expires=str(Timestamp(1)),
         user_id = 1,
@@ -329,7 +337,7 @@ def test_anonymous_password_reset(app, db):
 def test_authenticated_password_reset(app, db):
     password = '123'
     new_password = '12345678'
-    db.users.insert(
+    db.get_table('users').insert(
         id = 1,
         username='user',
         email='test@mail.com',
@@ -375,7 +383,9 @@ def test_login_requirement(app, db):
         raise AssertionError('Login requirement failed. No redirection.')
     assert '/auth/login' in redirect_location
 
-    db.users.insert(
+    users_table = db.get_table('users')
+
+    users_table.insert(
         username='user1',
         email='test1@mail.com',
         password=generate_password_hash('123')
@@ -392,7 +402,7 @@ def test_login_requirement(app, db):
     assert '/auth/verify' in redirect_location
     client.logout()
 
-    db.users.insert(
+    users_table.insert(
         username='user2',
         email='test2@mail.com',
         password=generate_password_hash('123'),
@@ -410,13 +420,14 @@ def test_login_requirement(app, db):
 def test_admin_requirement(app, db):
     client = TestClient(app)
 
-    db.users.insert(
+    users_table = db.get_table('users')
+    users_table.insert(
         username='user',
         email='test@mail.com',
         password=generate_password_hash('123'),
         is_verified=1
         )
-    db.users.insert(
+    users_table.insert(
         username='admin',
         email='admin@mail.com',
         password=generate_password_hash('123'),
@@ -447,7 +458,7 @@ def test_admin_requirement(app, db):
         response = client.get('/admin/')
         assert response.status_code == 200
 
-    with db.users.update(username = 'admin') as user:
+    with users_table.update(username = 'admin') as user:
         user.is_verified = 0
     
     with client:

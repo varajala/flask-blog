@@ -48,8 +48,8 @@ def test_table_creation():
 @microtest.test
 def test_loading_tables():
     db = Database(path)
-    users = db.users
-    posts = db.posts
+    users = db.get_table('users')
+    posts = db.get_table('posts')
     
     assert isinstance(users, Table)
     assert isinstance(posts, Table)
@@ -60,7 +60,7 @@ def test_loading_tables():
 @microtest.test
 def test_queries():
     db = Database(path)
-    users = db.users
+    users = db.get_table('users')
 
     usernames = ['user', 'tester', 'hacker']
     user_data = [ (f'user{i}', random.choice(usernames)) for i in range(99) ]
@@ -86,7 +86,7 @@ def test_queries():
 
 @microtest.test
 def test_updates():
-    users = db.users
+    users = db.get_table('users')
 
     users.insert(name='testuser', bio='testing')
     user = users.get(name='testuser')
@@ -97,7 +97,7 @@ def test_updates():
     assert users.get(name='testuser').bio == 'hacker'
 
 
-    posts = db.posts
+    posts = db.get_table('posts')
     posts.insert(content='test1', created='12:00 1.1.2021')
     posts.insert(content='test2', created='12:00 1.1.2021')
     posts.insert(content='test3', created='12:00 1.1.2021')
@@ -114,7 +114,7 @@ def test_updates():
 
 @microtest.test
 def test_deletions():
-    users = db.users
+    users = db.get_table('users')
 
     users.insert(name='deltest', bio='testing')
     matches = users.query(name='deltest')
@@ -139,7 +139,7 @@ def test_deletions():
 
 @microtest.test
 def test_drop_table():
-    users = db.users
+    users = db.get_table('users')
     assert isinstance(users, Table)
 
     db.drop_table('users')

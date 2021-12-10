@@ -42,11 +42,12 @@ def test_timestamps(app, db):
 @microtest.test
 def test_creating_sessions(app, db):
     with app.app_context():
-        assert len(db.sessions.get_all()) == 0
+        sessions_table = db.get_table('sessions')
+        assert len(sessions_table.get_all()) == 0
 
         session = sessions.create_new_session()
 
-        rows = db.sessions.get_all()
+        rows = sessions_table.get_all()
         assert len(rows) == 1
         
         row = rows[0]
@@ -67,11 +68,12 @@ def test_creating_sessions(app, db):
 @microtest.test
 def test_loading_sessions(app, db):
     with app.app_context():
+        sessions_table = db.get_table('sessions')
         session_id = b'\x00\x01'
         csrf_token = b'\x00\x02'
         userid = 1
         
-        db.sessions.insert(
+        sessions_table.insert(
             session_id = session_id,
             csrf_token = csrf_token,
             expires = str(Timestamp(1)),
@@ -83,22 +85,22 @@ def test_loading_sessions(app, db):
         assert session.id == session_id
         assert session.csrf_token == csrf_token
 
-        db.sessions.delete()
+        sessions_table.delete()
 
         session = sessions.load_user_session(None)
 
-        assert len(db.sessions.get_all()) == 1
+        assert len(sessions_table.get_all()) == 1
         assert session.is_anonymous
 
-        db.sessions.delete()
+        sessions_table.delete()
 
         session = sessions.load_user_session('100')
 
-        assert len(db.sessions.get_all()) == 1
+        assert len(sessions_table.get_all()) == 1
         assert session.is_anonymous
 
-        db.sessions.delete()
-        db.sessions.insert(
+        sessions_table.delete()
+        sessions_table.insert(
             session_id = session_id,
             csrf_token = csrf_token,
             expires = str(Timestamp(-1)),
@@ -115,15 +117,16 @@ def test_loading_sessions(app, db):
 @microtest.test
 def test_ending_sessions(app, db):
     with app.app_context():
+        sessions_table = db.get_table('sessions')
         sid = (1).to_bytes(32, 'big')
         csrf = bytes(bytearray(32))
         uid = 1
         
-        db.sessions.insert(session_id=sid, csrf_token=csrf, expires=str(Timestamp(12)),  user_id=uid)
+        sessions_table.insert(session_id=sid, csrf_token=csrf, expires=str(Timestamp(12)),  user_id=uid)
 
         sessions.end_session(sid)
 
-        rows = db.sessions.get_all()
+        rows = sessions_table.get_all()
         assert len(rows) == 0
 
 
@@ -131,7 +134,8 @@ def test_ending_sessions(app, db):
 @microtest.test
 def test_session_handling(app, db):
     with app.app_context():
-        db.users.insert(
+        users_table = db.get_table('users')
+        users_table.insert(
             username=username,
             email='test@mail.com',
             password=generate_password_hash(password)
@@ -174,9 +178,10 @@ def test_session_handling(app, db):
 @microtest.test
 def test_session_expiration(app, db):
     with app.app_context():
+        users_table = db.get_table('users')
         client = TestClient(app)
 
-        db.users.insert(
+        users_table.insert(
             username=username,
             email='test@mail.com',
             password=generate_password_hash(password)

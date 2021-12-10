@@ -1,4 +1,5 @@
 import flask
+import blog.typing as types
 import blog.security as security
 import blog.security.sessions as sessions
 import blog.models as models
@@ -15,7 +16,7 @@ blueprint = flask.Blueprint(
 
 @blueprint.route('/', methods=('GET',))
 @security.admin_only
-def index():
+def index() -> types.Response:
     session = flask.g.session
     user_list = models.users.get_all()
     csrf_token = session.csrf_token.hex()
@@ -24,7 +25,7 @@ def index():
 
 @blueprint.route('/users/<int:userid>/manage', methods=('GET',))
 @security.admin_only
-def manage_user(userid):
+def manage_user(userid: int) -> types.Response:
     session = flask.g.session
     csrf_token = session.csrf_token.hex()
     user = models.users.get(id = userid)    
@@ -35,7 +36,7 @@ def manage_user(userid):
 
 @blueprint.route('/users/<int:userid>/edit/username', methods=('POST',))
 @security.admin_only
-def edit_username(userid):
+def edit_username(userid: int) -> types.Response:
     request = flask.request
     session = flask.g.session
     manage_url = flask.url_for('admin.manage_user', userid=userid)
@@ -66,7 +67,7 @@ def edit_username(userid):
 
 @blueprint.route('/users/<int:userid>/edit/email', methods=('POST',))
 @security.admin_only
-def edit_email(userid):
+def edit_email(userid: int) -> types.Response:
     request = flask.request
     session = flask.g.session
     manage_url = flask.url_for('admin.manage_user', userid=userid)
@@ -97,7 +98,7 @@ def edit_email(userid):
 
 @blueprint.route('/users/<int:userid>/delete', methods=('POST',))
 @security.admin_only
-def delete_user(userid):
+def delete_user(userid: int) -> types.Response:
     request = flask.request
     session = flask.g.session
     manage_url = flask.url_for('admin.manage_user', userid=userid)
@@ -126,7 +127,7 @@ def delete_user(userid):
 
 @blueprint.route('/users/<int:userid>/verify', methods=('POST',))
 @security.admin_only
-def verify_user(userid):
+def verify_user(userid: int) -> types.Response:
     request = flask.request
     session = flask.g.session
     manage_url = flask.url_for('admin.manage_user', userid=userid)
@@ -153,7 +154,7 @@ def verify_user(userid):
 
 @blueprint.route('/users/<int:userid>/promote', methods=('POST',))
 @security.admin_only
-def make_admin(userid):
+def make_admin(userid: int):
     request = flask.request
     session = flask.g.session
     manage_url = flask.url_for('admin.manage_user', userid=userid)
@@ -184,14 +185,14 @@ def make_admin(userid):
 
 @blueprint.route('/users/create', methods=('POST',))
 @security.admin_only
-def create_user():
+def create_user() -> types.Response:
     request = flask.request
     session = flask.g.session
     index_url = flask.url_for('admin.index')
 
     csrf_token = request.form.get('csrf_token', None)
     if csrf_token is None:
-        return flask.redirect(blog_url)
+        return flask.redirect(index_url)
     
     try:
         src = bytes.fromhex(csrf_token)
@@ -200,7 +201,7 @@ def create_user():
 
     cmp = session.csrf_token
     if not security.matching_tokens(src, cmp):
-        return flask.redirect(blog_url)
+        return flask.redirect(index_url)
 
     username = request.form.get('username', '')
     email = request.form.get('email', '')

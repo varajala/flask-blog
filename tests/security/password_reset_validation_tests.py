@@ -31,7 +31,7 @@ def cleanup(db, app):
 @microtest.test
 def test_valid_reset_request(app, db):
     with app.app_context():
-        db.users.insert(username=username, email=email, password='123', is_verified = 1)
+        db.get_table('users').insert(username=username, email=email, password='123', is_verified = 1)
         form =  {
             'username': username,
             'email': email,
@@ -45,7 +45,7 @@ def test_valid_reset_request(app, db):
 @microtest.test
 def test_reset_request_invalid_username(app, db):
     with app.app_context():
-        db.users.insert(username=username, email=email, password='123', is_verified = 1)
+        db.get_table('users').insert(username=username, email=email, password='123', is_verified = 1)
         form =  {
             'username': 'some_user',
             'email': email,
@@ -59,7 +59,7 @@ def test_reset_request_invalid_username(app, db):
 @microtest.test
 def test_reset_request_invalid_email(app, db):
     with app.app_context():
-        db.users.insert(username=username, email=email, password='123', is_verified = 1)
+        db.get_table('users').insert(username=username, email=email, password='123', is_verified = 1)
         form =  {
             'username': username,
             'email': 'someemail@gmail.com',
@@ -73,7 +73,7 @@ def test_reset_request_invalid_email(app, db):
 @microtest.test
 def test_reset_request_invalid_csrf_token(app, db):
     with app.app_context():
-        db.users.insert(username=username, email=email, password='123', is_verified = 1)
+        db.get_table('users').insert(username=username, email=email, password='123', is_verified = 1)
         form =  {
             'username': username,
             'email': email,
@@ -87,7 +87,7 @@ def test_reset_request_invalid_csrf_token(app, db):
 @microtest.test
 def test_reset_request_logged_in(app, db):
     with app.app_context():
-        db.users.insert(username=username, email=email, password='123', is_verified = 1)
+        db.get_table('users').insert(username=username, email=email, password='123', is_verified = 1)
         form =  {
             'username': username,
             'email': email,
@@ -103,7 +103,7 @@ def test_reset_request_logged_in(app, db):
 @microtest.test
 def test_reset_request_not_verified(app, db):
     with app.app_context():
-        db.users.insert(username=username, email=email, password='123')
+        db.get_table('users').insert(username=username, email=email, password='123')
         form =  {
             'username': username,
             'email': email,
@@ -117,7 +117,7 @@ def test_reset_request_not_verified(app, db):
 @microtest.test
 def test_reset_request_empty_form(app, db):
     with app.app_context():
-        db.users.insert(username=username, email=email, password='123', is_verified = 1)
+        db.get_table('users').insert(username=username, email=email, password='123', is_verified = 1)
         form =  {
             'username': '',
             'email': '',
@@ -131,7 +131,7 @@ def test_reset_request_empty_form(app, db):
 @microtest.test
 def test_reset_request_missing_values(app, db):
     with app.app_context():
-        db.users.insert(username=username, email=email, password='123', is_verified = 1)
+        db.get_table('users').insert(username=username, email=email, password='123', is_verified = 1)
         form =  {}
 
         is_valid =  auth.is_valid_password_reset_request(form, session)

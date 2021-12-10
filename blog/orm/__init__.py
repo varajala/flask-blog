@@ -1,1 +1,1 @@
-from blog.orm.main import Database
+from blog.orm.main import Database, Table

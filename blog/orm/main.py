@@ -339,15 +339,11 @@ class Database:
             self.conn = None
 
 
-    def __getattribute__(self, attr):
-        try:
-            return object.__getattribute__(self, attr)
-        except AttributeError:
-            tables = object.__getattribute__(self, 'tables')
-            table = tables.get(attr, None)
-            if table is None:
-                raise AttributeError('No such table')
-            return table
+    def get_table(self, name: str):
+        table = self.tables.get(name, None)
+        if table is None:
+            raise AttributeError('No such table')
+        return table
 
 
 class Transaction:

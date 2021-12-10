@@ -22,7 +22,13 @@ session = Session(
 @microtest.reset
 def reset(db):
     db.reset()
-    db.users.insert(id = user_id, username = username, email = 'test@mail.com', password = '123', is_locked = 1)
+    db.get_table('users').insert(
+        id = user_id,
+        username = username,
+        email = 'test@mail.com',
+        password = '123',
+        is_locked = 1
+        )
 
 @microtest.cleanup
 def cleanup(db, app):
@@ -32,7 +38,10 @@ def cleanup(db, app):
 @microtest.test
 def test_valid_unlock_token(app, db):
     with app.app_context():
-        db.otps.insert(value=unlock_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
+        otps_table = db.get_table('otps')
+        users_table = db.get_table('users')
+        
+        otps_table.insert(value=unlock_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
         form =  {
             'unlock_token': unlock_token.hex(),
             'csrf_token': session.csrf_token.hex(),
@@ -41,16 +50,19 @@ def test_valid_unlock_token(app, db):
 
         err = auth.unlock_user_account(form, session)
         assert err is None
-        assert db.otps.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is None
+        assert otps_table.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is None
         
-        user = db.users.get(id = user_id)
+        user = users_table.get(id = user_id)
         assert not user.is_locked
 
 
 @microtest.test
 def test_expired_unlock_token(app, db):
     with app.app_context():
-        db.otps.insert(value=unlock_token, expires=str(Timestamp(-1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
+        otps_table = db.get_table('otps')
+        users_table = db.get_table('users')
+
+        otps_table.insert(value=unlock_token, expires=str(Timestamp(-1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
         form =  {
             'unlock_token': unlock_token.hex(),
             'csrf_token': session.csrf_token.hex(),
@@ -59,16 +71,19 @@ def test_expired_unlock_token(app, db):
 
         err = auth.unlock_user_account(form, session)
         assert err is None
-        assert db.otps.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is None
+        assert otps_table.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is None
         
-        user = db.users.get(id = user_id)
+        user = users_table.get(id = user_id)
         assert not user.is_locked
 
 
 @microtest.test
 def test_invalid_unlock_token(app, db):
     with app.app_context():
-        db.otps.insert(value=unlock_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
+        otps_table = db.get_table('otps')
+        users_table = db.get_table('users')
+
+        otps_table.insert(value=unlock_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
         form =  {
             'unlock_token': '123',
             'csrf_token': session.csrf_token.hex(),
@@ -77,16 +92,19 @@ def test_invalid_unlock_token(app, db):
 
         err = auth.unlock_user_account(form, session)
         assert err is not None
-        assert db.otps.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is not None
+        assert otps_table.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is not None
         
-        user = db.users.get(id = user_id)
+        user = users_table.get(id = user_id)
         assert user.is_locked
 
 
 @microtest.test
 def test_invalid_csrf_token(app, db):
     with app.app_context():
-        db.otps.insert(value=unlock_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
+        otps_table = db.get_table('otps')
+        users_table = db.get_table('users')
+
+        otps_table.insert(value=unlock_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
         form =  {
             'unlock_token': unlock_token.hex(),
             'csrf_token': '123',
@@ -95,16 +113,19 @@ def test_invalid_csrf_token(app, db):
 
         err = auth.unlock_user_account(form, session)
         assert err is not None
-        assert db.otps.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is not None
+        assert otps_table.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is not None
         
-        user = db.users.get(id = user_id)
+        user = users_table.get(id = user_id)
         assert user.is_locked
 
 
 @microtest.test
 def test_invalid_username(app, db):
     with app.app_context():
-        db.otps.insert(value=unlock_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
+        otps_table = db.get_table('otps')
+        users_table = db.get_table('users')
+        
+        otps_table.insert(value=unlock_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
         form =  {
             'unlock_token': unlock_token.hex(),
             'csrf_token': session.csrf_token.hex(),
@@ -113,16 +134,19 @@ def test_invalid_username(app, db):
 
         err = auth.unlock_user_account(form, session)
         assert err is not None
-        assert db.otps.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is not None
+        assert otps_table.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is not None
         
-        user = db.users.get(id = user_id)
+        user = users_table.get(id = user_id)
         assert user.is_locked
 
 
 @microtest.test
 def test_missing_values(app, db):
     with app.app_context():
-        db.otps.insert(value=unlock_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
+        otps_table = db.get_table('otps')
+        users_table = db.get_table('users')
+        
+        otps_table.insert(value=unlock_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
         form = {
             'unlock_token': '',
             'csrf_token': '',
@@ -131,21 +155,24 @@ def test_missing_values(app, db):
 
         err = auth.unlock_user_account(form, session)
         assert err is not None
-        assert db.otps.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is not None
+        assert otps_table.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is not None
         
-        user = db.users.get(id = user_id)
+        user = users_table.get(id = user_id)
         assert user.is_locked
 
 
 @microtest.test
 def test_empty_form(app, db):
     with app.app_context():
-        db.otps.insert(value=unlock_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
+        otps_table = db.get_table('otps')
+        users_table = db.get_table('users')
+        
+        otps_table.insert(value=unlock_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.ACCOUNT_LOCK)
         form =  {}
 
         err = auth.unlock_user_account(form, session)
         assert err is not None
-        assert db.otps.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is not None
+        assert otps_table.get(user_id = user_id, type = auth.OTP.ACCOUNT_LOCK) is not None
         
-        user = db.users.get(id = user_id)
+        user = users_table.get(id = user_id)
         assert user.is_locked

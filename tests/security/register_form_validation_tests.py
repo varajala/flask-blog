@@ -19,7 +19,7 @@ session = Session(
 
 @microtest.setup
 def setup(db, app):
-    db.users.insert(username=username, email=email, password='')
+    db.get_table('users').insert(username=username, email=email, password='')
 
 
 @microtest.cleanup
@@ -79,7 +79,7 @@ def test_invalid_email(app):
 @microtest.test
 def test_used_username(app, db):
     with app.app_context():
-        db.users.insert(username = 'user', email = 'user@mail.com', password = 'hash')
+        db.get_table('users').insert(username = 'user', email = 'user@mail.com', password = 'hash')
         
         form = {
             'username': username,

@@ -30,7 +30,12 @@ def cleanup(db, app):
 @microtest.test
 def test_valid_email_token(app, db):
     with app.app_context():
-        db.otps.insert(value=email_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.EMAIL)
+        db.get_table('otps').insert(
+            value=email_token,
+            expires=str(Timestamp(1)),
+            user_id=user_id,
+            type=auth.OTP.EMAIL
+            )
         form =  {
             'verification_token': email_token.hex(),
             'csrf_token': session.csrf_token.hex()
@@ -38,13 +43,13 @@ def test_valid_email_token(app, db):
 
         err = auth.validate_email_verification(form, session)
         assert err is None
-        assert db.otps.get(user_id = user_id, type = auth.OTP.EMAIL) is None
+        assert db.get_table('otps').get(user_id = user_id, type = auth.OTP.EMAIL) is None
 
     
 @microtest.test
 def test_invalid_token(app, db):
     with app.app_context():
-        db.otps.insert(value=email_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.EMAIL)
+        db.get_table('otps').insert(value=email_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.EMAIL)
         form =  {
             'verification_token': '123',
             'csrf_token': session.csrf_token.hex()
@@ -52,24 +57,24 @@ def test_invalid_token(app, db):
 
         err = auth.validate_email_verification(form, session)
         assert err is not None
-        assert db.otps.get(user_id = user_id, type = auth.OTP.EMAIL) is not None
+        assert db.get_table('otps').get(user_id = user_id, type = auth.OTP.EMAIL) is not None
 
 
 @microtest.test
 def test_non_existing_csrf_token(app, db):
     with app.app_context():
-        db.otps.insert(value=email_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.EMAIL)
+        db.get_table('otps').insert(value=email_token, expires=str(Timestamp(1)), user_id=user_id, type=auth.OTP.EMAIL)
         form =  {'verification_token': email_token.hex()}
 
         err = auth.validate_email_verification(form, session)
         assert err is not None
-        assert db.otps.get(user_id = user_id, type = auth.OTP.EMAIL) is not None
+        assert db.get_table('otps').get(user_id = user_id, type = auth.OTP.EMAIL) is not None
 
 
 @microtest.test
 def test_expired_token(app, db):
     with app.app_context():
-        db.otps.insert(value=email_token, expires=str(Timestamp(-1)), user_id=user_id, type=auth.OTP.EMAIL)
+        db.get_table('otps').insert(value=email_token, expires=str(Timestamp(-1)), user_id=user_id, type=auth.OTP.EMAIL)
 
         form =  {
             'verification_token': email_token.hex(),
@@ -78,4 +83,4 @@ def test_expired_token(app, db):
 
         err = auth.validate_email_verification(form, session)
         assert err is not None
-        assert db.otps.get(user_id = user_id, type = auth.OTP.EMAIL) is None
+        assert db.get_table('otps').get(user_id = user_id, type = auth.OTP.EMAIL) is None
