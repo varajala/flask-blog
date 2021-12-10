@@ -8,6 +8,9 @@ from typing import (
     Optional,
     Generic,
     NewType,
+    
+    TYPE_CHECKING,
+    cast,
 )
 
 

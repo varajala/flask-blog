@@ -4,7 +4,14 @@ from flask.cli import with_appcontext
 
 import blog.cli as cli
 import blog.security.utils as utils
-import blog.models as models
+import blog.typing as types
+
+if types.TYPE_CHECKING:
+    import blog.models
+    models = types.cast(blog.models.Module, blog.models)
+else:
+    import blog.models as models
+
 
 
 @cli.register

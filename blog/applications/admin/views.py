@@ -2,9 +2,13 @@ import flask
 import blog.typing as types
 import blog.security as security
 import blog.security.sessions as sessions
-import blog.models as models
 from blog.common import path_relative_to_file
 
+if types.TYPE_CHECKING:
+    import blog.models
+    models = types.cast(blog.models.Module, blog.models)
+else:
+    import blog.models as models
 
 
 blueprint = flask.Blueprint(

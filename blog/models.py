@@ -1,14 +1,7 @@
-"""
-Interface between the included ORM package and the flask application.
-
-Author Valtteri Rajalainen
-"""
-
-import sys
 import flask
-import blog.orm as orm
+import sys
 import blog.typing as types
-from blog.common import Namespace
+import blog.orm as orm
 
 
 def create_and_store_database_object() -> types.DatabaseObject:
@@ -28,10 +21,10 @@ def get_database_table(table_name: str) -> types.DatabaseTable:
 
 class Module(types.Module):
 
-    sessions:   types.DatabaseTable = property(fget=lambda args: get_database_table('sessions'))
-    users:      types.DatabaseTable = property(fget=lambda args: get_database_table('users'))
-    otps:       types.DatabaseTable = property(fget=lambda args: get_database_table('otps'))
-    posts:      types.DatabaseTable = property(fget=lambda args: get_database_table('posts'))
+    sessions = property(fget=lambda args: get_database_table('sessions'))
+    users = property(fget=lambda args: get_database_table('users'))
+    otps = property(fget=lambda args: get_database_table('otps'))
+    posts = property(fget=lambda args: get_database_table('posts'))
 
 
     def init_database(self, schema_module: str):
@@ -44,7 +37,6 @@ class Module(types.Module):
         if database is not None:
             database.close_connection()
 
-
-module = Module(__name__)
-module.__file__ = __file__
-sys.modules[__name__] = module
+models = Module(__name__)
+models.__file__ = __file__
+sys.modules[__name__] = models
