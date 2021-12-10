@@ -43,7 +43,7 @@ class Table:
     access the columns with the dotted notation: value = row.column.
     """
     
-    def __init__(self, database: Database, name: str):
+    def __init__(self, database, name: str):
         self.database = database
         self.name = name
         self.updated_obj = None
