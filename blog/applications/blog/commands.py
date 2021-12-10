@@ -4,7 +4,14 @@ from flask.cli import with_appcontext
 
 import blog.cli as cli
 import blog.security as security
-import blog.models as models
+import blog.typing as types
+
+
+if types.TYPE_CHECKING:
+    import blog.models
+    models = types.cast(blog.models.Module, blog.models)
+else:
+    import blog.models as models
 
 
 @cli.register
@@ -32,7 +39,7 @@ def init_database():
 @click.option('--email', prompt='Email address')
 @click.option('--password', prompt='Password', hide_input=True, confirmation_prompt=True)
 @with_appcontext
-def create_user(username, email, password):
+def create_user(username: str, email: str, password: str):
     if not security.valid_username(username):
         click.secho('ERROR ', fg='red', nl=False)
         info = f'Failed to create a new user. Username {username} is invalid.\n'

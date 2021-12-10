@@ -1,8 +1,15 @@
 import flask
-
 import blog.security as security
-import blog.models as models
+import blog.typing as types
 from blog.common import Timestamp, path_relative_to_file
+
+
+if types.TYPE_CHECKING:
+    import blog.models
+    models = types.cast(blog.models.Module, blog.models)
+else:
+    import blog.models as models
+
 
 blueprint = flask.Blueprint(
     'blog', __name__,
@@ -12,7 +19,7 @@ blueprint = flask.Blueprint(
 
 @blueprint.route('/', methods=('GET',))
 @security.authentication_required
-def index():
+def index() -> types.Response:
     user = flask.g.user
     session = flask.g.session
     csrf_token = session.csrf_token.hex()
@@ -22,7 +29,7 @@ def index():
 
 @blueprint.route('/create', methods=('POST',))
 @security.authentication_required
-def create():
+def create() -> types.Response:
     request = flask.request
     user = flask.g.user
     session = flask.g.session
@@ -50,7 +57,7 @@ def create():
 
 @blueprint.route('/update/<int:postid>', methods=('POST',))
 @security.authentication_required
-def update(postid):
+def update(postid: int) -> types.Response:
     blog_url = flask.url_for('index')
     session = flask.g.session
     request = flask.request
@@ -81,7 +88,7 @@ def update(postid):
 
 @blueprint.route('/delete/<int:postid>', methods=('POST',))
 @security.authentication_required
-def delete(postid):
+def delete(postid: int) -> types.Response:
     blog_url = flask.url_for('index')
     session = flask.g.session
     request = flask.request
