@@ -71,9 +71,3 @@ const commitUpdate = (postid) => {
     form.submit()
     form.setAttribute("action", "/create")
 }
-
-
-const hideMessage = () => {
-    let div = document.getElementById("messages")
-    div.setAttribute("hidden", true)
-}
