@@ -3,6 +3,8 @@ import smtplib
 import ssl
 import base64
 import sys
+import typing
+
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from threading import Thread
@@ -45,6 +47,7 @@ def send_email(message: dict, reciever: str, host: tuple, credentials_path: str,
         write_email_to_stream(mime_msg.as_string(), port)
         return
 
+    server: typing.Union[smtplib.SMTP_SSL, smtplib.SMTP]
     if use_ssl:
         context = ssl.create_default_context()
         server = smtplib.SMTP_SSL(addr, port, context=context)

@@ -26,19 +26,13 @@ OPERATORS = (
     )
 
 
-__namespace__ = dict()
-
-def export(func: typing.Callable) -> typing.Callable:
-    __namespace__[func.__name__] = func
-    return func
-
-
 def valid_name(name: str) -> bool:
     if len(name) > NAME_LENGTH:
         return False
     if name.startswith(SQLITE_PREFIX):
         return False
     return re.fullmatch(re.compile(NAME_RE), name) is not None
+
 
 def is_decimal(string: str) -> bool:
     return re.fullmatch(re.compile(DECIMAL_RE), string) is not None
@@ -110,23 +104,6 @@ class DataType:
         stream.seek(0)
         sql = stream.read()
         return sql
-
-
-@export
-def integer(**kwargs) -> DataType:
-    return DataType('INTEGER', **kwargs)
-
-@export
-def real(**kwargs) -> DataType:
-    return DataType('REAL', **kwargs)
-
-@export
-def text(**kwargs) -> DataType:
-    return DataType('TEXT', **kwargs)
-
-@export
-def blob(**kwargs) -> DataType:
-    return DataType('BLOB', **kwargs)
 
 
 def valid_schema(schema: typing.Dict[str, typing.Any]):

@@ -1,9 +1,10 @@
 """
 Database schema implemented using the included ORM package.
-This module is executed with all datatype objects in its namespace.
 
 Author: Valtteri Rajalainen
 """
+
+from flask_blog.orm.sql.datatypes import *
 
 
 users = {

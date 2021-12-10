@@ -1,5 +1,6 @@
 import microtest
 import flask_blog.orm.sql as sql
+import flask_blog.orm.sql.datatypes as sql_datatypes
 
 
 @microtest.test
@@ -76,22 +77,22 @@ def test_delete():
 
 @microtest.test
 def test_datatypes():
-    dt = sql.integer()
+    dt = sql_datatypes.integer()
     assert dt.resolve() == 'INTEGER'
 
-    dt = sql.integer(primary_key=True, auto_increment=True)
+    dt = sql_datatypes.integer(primary_key=True, auto_increment=True)
     assert dt.resolve() == 'INTEGER PRIMARY KEY AUTOINCREMENT'
 
-    dt = sql.integer(foreign_key=('user_id', 'users', 'id'))
+    dt = sql_datatypes.integer(foreign_key=('user_id', 'users', 'id'))
     assert dt.resolve() == 'INTEGER, FOREIGN KEY(user_id) REFERENCES users(id)'
 
-    dt = sql.text(unique=True, not_null=True)
+    dt = sql_datatypes.text(unique=True, not_null=True)
     assert dt.resolve() == 'TEXT UNIQUE NOT NULL'
 
-    dt = sql.real()
+    dt = sql_datatypes.real()
     assert dt.resolve() == 'REAL'
 
-    dt = sql.blob()
+    dt = sql_datatypes.blob()
     assert dt.resolve() == 'BLOB'
 
     assert microtest.raises(sql.DataType, ('; DROP TABLE users',), ValueError)
@@ -106,15 +107,15 @@ def test_datatypes():
 @microtest.test
 def test_creating_tables():
     result = sql.create_table('users',
-        id = sql.integer(primary_key=True, auto_increment=True),
-        name = sql.text(unique=True, not_null=True)
+        id = sql_datatypes.integer(primary_key=True, auto_increment=True),
+        name = sql_datatypes.text(unique=True, not_null=True)
         )
     assert result.lower() == 'create table users (id integer primary key autoincrement, name text unique not null)'
 
     result = sql.create_table('posts',
-        id = sql.integer(primary_key=True, auto_increment=True),
-        user_id = sql.integer(foreign_key=('user_id', 'users', 'id')),
-        content = sql.text()
+        id = sql_datatypes.integer(primary_key=True, auto_increment=True),
+        user_id = sql_datatypes.integer(foreign_key=('user_id', 'users', 'id')),
+        content = sql_datatypes.text()
         )
     assert result.lower() == 'create table posts (id integer primary key autoincrement, user_id integer, foreign key(user_id) references users(id), content text)'
 
