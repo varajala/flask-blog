@@ -11,6 +11,7 @@ Author: Valtteri Rajalainen
 
 import io
 import re
+import typing
 
 
 NAME_LENGTH = 32
@@ -27,20 +28,20 @@ OPERATORS = (
 
 __namespace__ = dict()
 
-def export(func):
+def export(func: typing.Callable) -> typing.Callable:
     __namespace__[func.__name__] = func
     return func
 
 
-def valid_name(name):
+def valid_name(name: str) -> bool:
     if len(name) > NAME_LENGTH:
         return False
     if name.startswith(SQLITE_PREFIX):
         return False
-    return re.fullmatch(re.compile(NAME_RE), name)
+    return re.fullmatch(re.compile(NAME_RE), name) is not None
 
-def is_decimal(string):
-    return re.fullmatch(re.compile(DECIMAL_RE), string)
+def is_decimal(string: str) -> bool:
+    return re.fullmatch(re.compile(DECIMAL_RE), string) is not None
 
 
 class DataType:
@@ -65,7 +66,7 @@ class DataType:
         self.default = default
 
 
-    def resolve(self):
+    def resolve(self) -> str:
         """
         Generate the actual SQL for this datatype.
         No checks are made for validating the combinations of the modifiers.
@@ -112,23 +113,23 @@ class DataType:
 
 
 @export
-def integer(**kwargs):
+def integer(**kwargs) -> DataType:
     return DataType('INTEGER', **kwargs)
 
 @export
-def real(**kwargs):
+def real(**kwargs) -> DataType:
     return DataType('REAL', **kwargs)
 
 @export
-def text(**kwargs):
+def text(**kwargs) -> DataType:
     return DataType('TEXT', **kwargs)
 
 @export
-def blob(**kwargs):
+def blob(**kwargs) -> DataType:
     return DataType('BLOB', **kwargs)
 
 
-def valid_schema(schema):
+def valid_schema(schema: typing.Dict[str, typing.Any]):
     if not isinstance(schema, dict):
         return False
     valid_types = [ isinstance(item, DataType) for item in schema.values() ]
@@ -136,11 +137,11 @@ def valid_schema(schema):
     return all(valid_types) and all(valid_names)
 
 
-def valid_query(query):
+def valid_query(query: typing.Dict[str, typing.Any]) -> bool:
     return all((valid_name(name) for name in query.keys()))
 
 
-def create_table(name_, **schema):
+def create_table(name_: str, **schema) -> str:
     if not valid_name(name_):
         raise ValueError('Invalid table name')
 
@@ -176,7 +177,7 @@ def drop_table(name_):
     return sql
 
 
-def insert(table, columns):
+def insert(table: str, columns: typing.List[str]) -> str:
     if not valid_name(table):
         raise ValueError('Invalid table name')
     
@@ -206,7 +207,7 @@ def insert(table, columns):
     return sql
 
 
-def select(table, columns=None, **kwargs):
+def select(table: str, columns: typing.Optional[typing.List[str]] = None, **kwargs) -> str:
     if not valid_name(table):
         raise ValueError('Invalid table name')
     
@@ -239,7 +240,7 @@ def select(table, columns=None, **kwargs):
     return sql
 
 
-def update(table, columns, **kwargs):
+def update(table: str, columns: typing.List[str], **kwargs) -> str:
     if not valid_name(table):
         raise ValueError('Invalid table name')
     
@@ -277,7 +278,7 @@ def update(table, columns, **kwargs):
     return sql
 
 
-def delete(table, **kwargs):
+def delete(table: str, **kwargs) -> str:
     if not valid_name(table):
         raise ValueError('Invalid table name')
 
@@ -306,5 +307,5 @@ def delete(table, **kwargs):
     return sql
 
 
-def list_tables():
+def list_tables() -> str:
     return 'SELECT name FROM sqlite_master WHERE type = \'table\' AND name NOT LIKE \'sqlite%\';'

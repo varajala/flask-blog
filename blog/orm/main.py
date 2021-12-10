@@ -10,6 +10,8 @@ Author: Valtteri Rajalainen
 import sqlite3
 import os
 import runpy
+import typing
+
 import blog.orm.sql as sql
 from blog.common import Namespace
 
@@ -41,7 +43,7 @@ class Table:
     access the columns with the dotted notation: value = row.column.
     """
     
-    def __init__(self, database, name):
+    def __init__(self, database: Database, name: str):
         self.database = database
         self.name = name
         self.updated_obj = None
@@ -61,7 +63,7 @@ class Table:
             return cursor.fetchall()
 
 
-    def get(self, **kwargs):
+    def get(self, **kwargs) -> Namespace:
         """
         Perform SELECT - queries. Returns a single row or None if no results.
 
@@ -77,16 +79,16 @@ class Table:
         conn = self.database.conn
         if conn is not None:
             cursor = conn.cursor()
-            cursor.execute(sql.select(self.name, **query), tuple(kwargs.values()))
+            cursor.execute(sql.select(self.name, None, **query), tuple(kwargs.values()))
             return cursor.fetchone()
 
         with self.database.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute(sql.select(self.name, **query), tuple(kwargs.values()))
+            cursor.execute(sql.select(self.name, None, **query), tuple(kwargs.values()))
             return cursor.fetchone()
 
 
-    def query(self, **kwargs):
+    def query(self, **kwargs) -> typing.List[Namespace]:
         """
         Perform SELECT - queries. Returns a list of results.
         Use the .get_all() - method to retieve all rows from a table.
@@ -103,12 +105,12 @@ class Table:
         conn = self.database.conn
         if conn is not None:
             cursor = conn.cursor()
-            cursor.execute(sql.select(self.name, **query), tuple(kwargs.values()))
+            cursor.execute(sql.select(self.name, None, **query), tuple(kwargs.values()))
             return cursor.fetchall()
 
         with self.database.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute(sql.select(self.name, **query), tuple(kwargs.values()))
+            cursor.execute(sql.select(self.name, None, **query), tuple(kwargs.values()))
             return cursor.fetchall()
 
 
@@ -140,7 +142,7 @@ class Table:
             conn.commit()
 
 
-    def update(self, **kwargs):
+    def update(self, **kwargs) -> typing.ContextManager:
         """
         Perform UPDATE - actions. Use the context manager api:
 
@@ -157,13 +159,13 @@ class Table:
         return Transaction(self, kwargs)
 
 
-    def _make_updates(self, restrictions, changes):
+    def _make_updates(self, restrictions: typing.Dict[str, object], changes: typing.Dict[str, object]):
         """
         Commit updates made within the context manager.
         Use the context manager api instead of this.
         """
         query = { col: sql.EQ for col in restrictions.keys() }
-        columns = tuple(changes.keys())
+        columns = list(changes.keys())
         params = tuple(list(changes.values()) + list(restrictions.values()))
 
         conn = self.database.conn
@@ -211,13 +213,13 @@ class Table:
 
 class Database:
 
-    def __init__(self, path):
+    def __init__(self, path: str):
         self.path = path
-        self.conn = None
+        self.conn: typing.Optional[sqlite3.Connection] = None
         self.tables = { name: Table(self, name) for name in self.list_tables() }
 
 
-    def init(self, schema_module):
+    def init(self, schema_module: str):
         """
         Create tables specified inside .py - file.
         The schema_module param must be string in form of 'pkg.module'.
@@ -258,13 +260,13 @@ class Database:
             self.conn = self.connect()
 
 
-    def connect(self):
+    def connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.path)
         conn.row_factory = row_factory
         return conn
 
 
-    def create_table(self, name, schema):
+    def create_table(self, name: str, schema: typing.Dict[str, sql.DataType]) -> Table:
         """
         Create a new table.
 
@@ -300,7 +302,7 @@ class Database:
         return table
 
 
-    def list_tables(self):
+    def list_tables(self) -> typing.List[str]:
         if self.conn:
             cursor = self.conn.cursor()
             cursor.execute(sql.list_tables())
@@ -315,7 +317,7 @@ class Database:
         return [ row.name for row in tables ]
 
 
-    def drop_table(self, name):
+    def drop_table(self, name: str):
         if name not in self.tables:
             raise ValueError(f'No such table: "{name}"')
 
@@ -339,7 +341,7 @@ class Database:
             self.conn = None
 
 
-    def get_table(self, name: str):
+    def get_table(self, name: str) -> Table:
         table = self.tables.get(name, None)
         if table is None:
             raise AttributeError('No such table')
@@ -370,7 +372,7 @@ class Transaction:
             table._make_updates(query, changes)
 
 
-def row_factory(cursor, row_data):
+def row_factory(cursor: sqlite3.Cursor, row_data: typing.Tuple[typing.Any]) -> Namespace:
     result = dict()
     for i, col in enumerate(cursor.description):
         col_name = col[0]
