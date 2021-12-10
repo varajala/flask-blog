@@ -2,9 +2,16 @@ import flask
 from blog.security.utils import *
 from blog.security.auth import *
 from blog.common import path_relative_to_file
+import blog.typing as types
 import blog.notifications as notifications
 import blog.security.sessions as sessions
-import blog.models as models
+
+
+if types.TYPE_CHECKING:
+    import blog.models
+    models = types.cast(blog.models.Module, blog.models)
+else:
+    import blog.models as models
 
 
 __all__ = [
@@ -25,7 +32,7 @@ blueprint = flask.Blueprint(
 
 
 @blueprint.route('/register', methods=('GET', 'POST'))
-def register():
+def register() -> types.Response:
     request = flask.request
     session = flask.g.session
     
@@ -37,9 +44,12 @@ def register():
 
     credentials, error = validate_registration_form(request.form, session)
 
-    if error:
+    if error is not None:
         flask.flash(error)
         return flask.render_template('register.html')
+
+    if credentials is None:
+        raise TypeError()
 
     models.users.insert(
         username = credentials.username,
@@ -56,7 +66,7 @@ def register():
 
 
 @blueprint.route('/login', methods=('GET', 'POST'))
-def login():
+def login() -> types.Response:
     request = flask.request
     session = flask.g.session
     
@@ -89,7 +99,7 @@ def login():
 
 
 @blueprint.route('/logout', methods=('GET', 'POST'))
-def logout():
+def logout() -> types.Response:
     session = flask.g.session
     request = flask.request
     if request.method == 'GET':
@@ -109,7 +119,7 @@ def logout():
 
 @blueprint.route('/verify', methods=('GET', 'POST'))
 @only_login_required
-def verify():
+def verify() -> types.Response:
     request = flask.request
     session = flask.g.session
     user = flask.g.user
@@ -130,7 +140,7 @@ def verify():
 
 
 @blueprint.route('/unlock', methods=('GET', 'POST'))
-def unlock():
+def unlock() -> types.Response:
     request = flask.request
     session = flask.g.session
     
@@ -149,7 +159,7 @@ def unlock():
 
 
 @blueprint.route('/reset-password/request', methods=('GET', 'POST'))
-def request_password_reset():
+def request_password_reset() -> types.Response:
     request = flask.request
     session = flask.g.session
     
@@ -166,7 +176,7 @@ def request_password_reset():
 
 
 @blueprint.route('/reset-password', methods=('GET', 'POST'))
-def reset_password():
+def reset_password() -> types.Response:
     request = flask.request
     session = flask.g.session
     

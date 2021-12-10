@@ -14,13 +14,18 @@ from werkzeug.security import check_password_hash
 
 from blog.common import *
 from blog.security.utils import *
+import blog.typing as types
 import blog.notifications as notifications
 import blog.security.sessions as sessions
-import blog.models as models
+
+if types.TYPE_CHECKING:
+    import blog.models
+    models = types.cast(blog.models.Module, blog.models)
+else:
+    import blog.models as models
 
 
-
-def admin_only(view):
+def admin_only(view: types.ViewFunction) -> types.ViewFunction:
     """
     Check if the session is authenticated (userid > 0),
     user is verified and the user is marked as admin.
@@ -49,7 +54,7 @@ def admin_only(view):
     return wrapper
 
 
-def authentication_required(view):
+def authentication_required(view: ViewFunction) -> ViewFunction:
     """
     Check if the session is authenticated (userid > 0)
     and that the user is verified.
@@ -73,7 +78,7 @@ def authentication_required(view):
     return wrapper
 
 
-def only_login_required(view):
+def only_login_required(view: ViewFunction) -> ViewFunction:
     """
     Check if the session is authenticated (userid > 0).
     Redirect to login if not.
@@ -89,7 +94,7 @@ def only_login_required(view):
     return wrapper
 
 
-def login_user(user):
+def login_user(user: Namespace):
     """
     End the anonymous session and create new session with the given userid.
     Set the flask.g.user to the user namespace object. Resets the login attempts.
@@ -108,7 +113,7 @@ def login_user(user):
         user_model.login_attempts = 0
 
 
-def logout_user(user_session):
+def logout_user(user_session: Session):
     """
     End the authenticated session and create new anonymous session.
     Remove the user namespace object from flask.g.
@@ -121,12 +126,12 @@ def logout_user(user_session):
     flask.session[SESSIONID] = session.id.hex()
 
 
-def verify_user(userid):
+def verify_user(userid: int):
     with models.users.update(id = userid) as user:
         user.is_verified = 1
 
 
-def valid_form_csrf_token(form, cmp):
+def valid_form_csrf_token(form: types.Dict[str, str], cmp: bytes) -> bool:
     csrf_token = form.get('csrf_token', '00')
     try:
         src = bytes.fromhex(csrf_token)
@@ -135,7 +140,10 @@ def valid_form_csrf_token(form, cmp):
     return matching_tokens(src, cmp)
 
 
-def validate_registration_form(form, session) -> tuple:
+def validate_registration_form(
+    form: types.Dict[str, str],
+    session: Session
+    ) -> types.Tuple[types.Optional[Namespace], types.Optional[str]]:
     """
     Validate the form user sent for registering.
 
@@ -191,7 +199,10 @@ def validate_registration_form(form, session) -> tuple:
     return credentials, error
 
 
-def validate_login_form(form, session) -> tuple:
+def validate_login_form(
+    form: types.Dict[str, str],
+    session: Session
+    ) -> types.Tuple[types.Optional[Namespace], types.Optional[str]]:
     """
     Validate the form user sent for login.
 
@@ -226,7 +237,7 @@ def validate_login_form(form, session) -> tuple:
     return (None, error) if error else (user, None)
 
 
-def validate_email_verification(form, session) -> str:
+def validate_email_verification(form: types.Dict[str, str], session: Session) -> types.Optional[str]:
     """
     Validate the email verification token provided in the form.
 
@@ -258,7 +269,7 @@ def validate_email_verification(form, session) -> str:
     return None if success else 'Verification failed.'
 
 
-def validate_password_reset(form, session) -> str:
+def validate_password_reset(form: types.Dict[str, str], session: Session) -> types.Optional[str]:
     def when_anonymous(form, session):
         username = form.get('username', '')
         email = form.get('email', '')
@@ -317,7 +328,7 @@ def validate_password_reset(form, session) -> str:
     return None if all(conditions) else 'Failed to reset the password'
 
 
-def unlock_user_account(form, session) -> str:
+def unlock_user_account(form: types.Dict[str, str], session: Session) -> types.Optional[str]:
     """
     Validate the account unlock token provided in the form.
 
@@ -366,7 +377,7 @@ def unlock_user_account(form, session) -> str:
     return message
 
 
-def record_login_attempt(form) -> int:
+def record_login_attempt(form: types.Dict[str, str]) -> types.Tuple[Namespace, bool]:
     username = form.get('username', '')
     user = models.users.get(username = username)
     maxed_out = False
@@ -395,7 +406,7 @@ def record_login_attempt(form) -> int:
     return user, maxed_out
 
 
-def is_valid_password_reset_request(form, session):
+def is_valid_password_reset_request(form: types.Dict[str, str], session: Session) -> bool:
     username = form.get('username', '')
     email = form.get('email', '')
 
@@ -412,7 +423,7 @@ def is_valid_password_reset_request(form, session):
     return all(conditions)
 
 
-def generate_otp(user_id, otp_type, lifetime):
+def generate_otp(user_id: int, otp_type: str, lifetime: int) -> types.Tuple[Namespace, Timestamp]:
     if otp_type not in OTP_TYPES:
         raise TypeError('Invalid OTP type.')
     
@@ -430,7 +441,7 @@ def generate_otp(user_id, otp_type, lifetime):
     return otp, expires
 
 
-def send_verification_email(reciever: str, otp: bytes, expires: Timestamp, base_url: str):
+def send_verification_email(reciever: str, otp: Namespace, expires: Timestamp, base_url: str):
     context = {
         'reciever':reciever,
         'token':otp.hex(),
@@ -448,7 +459,7 @@ def send_verification_email(reciever: str, otp: bytes, expires: Timestamp, base_
     notifications.send_email(message, reciever, host, credentials_path, use_ssl)
 
 
-def send_account_lock_email(reciever: str, otp: bytes, expires: Timestamp, base_url: str):
+def send_account_lock_email(reciever: str, otp: Namespace, expires: Timestamp, base_url: str):
     context = {
         'reciever':reciever,
         'token':otp.hex(),
@@ -466,7 +477,7 @@ def send_account_lock_email(reciever: str, otp: bytes, expires: Timestamp, base_
     notifications.send_email(message, reciever, host, credentials_path, use_ssl)
 
 
-def send_password_reset_email(reciever: str, otp: bytes, expires: Timestamp, base_url: str):
+def send_password_reset_email(reciever: str, otp: Namespace, expires: Timestamp, base_url: str):
     context = {
         'reciever':reciever,
         'token':otp.hex(),

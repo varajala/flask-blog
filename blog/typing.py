@@ -5,6 +5,10 @@ from types import ModuleType
 from typing import (
     List,
     Dict,
+    Tuple,
+    Callable,
+    Any,
+    
     Optional,
     Generic,
     NewType,
@@ -15,6 +19,8 @@ from typing import (
 
 
 Response = flask_types.ResponseValue
+ViewFunction = Callable[[Any], Response]
+
 Module = ModuleType
 
 DatabaseTable = Table
