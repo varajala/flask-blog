@@ -125,6 +125,8 @@ def delete_user(userid: int) -> types.Response:
     if row is not None:
         sessions.end_session(row.session_id)
 
+    models.otps.delete(user_id = userid)
+    models.posts.delete(author_id = userid)
     models.users.delete(id = userid)
     return flask.redirect(flask.url_for('admin.index'))
 

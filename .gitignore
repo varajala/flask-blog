@@ -11,5 +11,5 @@ venv
 # Other assets
 *.egg-info
 **.db
-**email-credentials
+**/email-credentials
 

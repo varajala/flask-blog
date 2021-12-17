@@ -2,10 +2,11 @@ import subprocess as subp
 import tempfile
 import pathlib
 import sys
-import socket
-import time
-import microtest
 import base64
+
+import microtest
+import microtest.utils as utils
+
 from contextlib import suppress
 from threading import Lock
 
@@ -40,19 +41,6 @@ class CredentialFile:
         pass
 
 
-def wait_for_server_init():
-    host = (LOCALHOST, SMTP_PORT)
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as soc:
-        while True:
-            try:
-                soc.connect(host)
-            except OSError:
-                time.sleep(0.01)
-                continue
-            else:
-                break
-
-
 def open_credential_file(*args, **kwargs):
     return CredentialFile()
 
@@ -60,22 +48,12 @@ def open_credential_file(*args, **kwargs):
 @microtest.setup
 def setup():
     global file, proc
-    file = tempfile.TemporaryFile(mode='w+')
-
-    script_path = pathlib.Path(__file__).parent.joinpath('smtp.sh')
-    cmd = ['python3', '-u', '-m', 'smtpd', '-c', 'DebuggingServer', '-n', f'{LOCALHOST}:{SMTP_PORT}']
-    proc = subp.Popen(cmd, stdout=file)
-    wait_for_server_init()
+    proc = utils.start_smtp_server(port=SMTP_PORT)
 
 
 @microtest.cleanup
 def cleanup():
-    try:
-        proc.wait(0.5)
-    except subp.TimeoutExpired:
-        proc.kill()
-    
-    file.close()
+    proc.terminate()
 
 
 @microtest.test
@@ -109,8 +87,6 @@ def test_sending_email():
     mutex = Lock()
     notifications.mutex = mutex
 
-    email_start = file.tell()
-    
     with microtest.patch(notifications, __builtins__ = builtins):
         notifications.send_email(
             message,
@@ -121,8 +97,7 @@ def test_sending_email():
             )
 
     with mutex:
-        file.seek(email_start)
-        email = file.read()
+        email = proc.read_output()
         assert f'To: {recv}' in email
         assert f'From: {EMAIL_ADDR}' in email
         assert 'Subject: testing' in email
