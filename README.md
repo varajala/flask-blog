@@ -1,5 +1,5 @@
 # flask-blog
-Simple Flask blog webiste extended from the Flask tutorial app.
+Simple Flask blog website extended from the Flask tutorial app.
 Includes csrf protection, server side sessions, account verification via email and admin roles...
 
 
